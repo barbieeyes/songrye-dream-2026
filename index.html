@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>담장 없는 탐구</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+
+/* Layout idea: a dark exhibition brochure opened flat on a night-sky table; one spread at a time, pages turn around the centre spine. */
+:root{
+  --bg:#03060F; --paper:#0A1226; --paper2:#0D1830; --line:rgba(140,190,255,.18); --ink:#E8F0FF; --mute:#93A4C4; --soft:#C6D3EE;
+  --cyan:#4FD8FF; --violet:#9B7BFF; --lime:#7CE38B; --amber:#FFB547;
+  --d1:#2B4C9B; --d2:#1FA5A5; --d3:#3DAA5C; --d4:#7B5CC4;
+  --accent:var(--cyan);
+  --f-display:"Black Han Sans","Noto Sans KR",system-ui,sans-serif;
+  --f-body:"Noto Sans KR",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --pw:600px; --ph:760px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{word-break:keep-all;overflow-wrap:break-word;margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.6;font-size:15px;overflow:hidden}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+.glow-top{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(1200px 620px at 50% -12%,rgba(18,58,138,.42),transparent 70%)}
+a{color:var(--cyan)}
+img{max-width:100%;display:block}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:6px}
+h1,h2,h3,h4{text-wrap:balance;margin:0}
+p{margin:0}
+.mono{font-family:var(--f-mono);letter-spacing:.18em;text-transform:uppercase;font-size:11px}
+.silver{background:linear-gradient(180deg,#FFFFFF 0%,#D7E2F5 45%,#8FA6CC 100%);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 16px rgba(79,170,255,.45))}
+
+/* TOP BAR */
+.top{position:fixed;top:0;left:0;right:0;height:56px;z-index:50;display:flex;align-items:center;gap:12px;padding:0 18px;background:rgba(3,6,15,.7);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{font-family:var(--f-display);font-size:18px;white-space:nowrap;color:#fff;text-decoration:none;background:none;border:0;padding:0;text-align:left}
+.brand small{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.2em;color:var(--cyan);display:block;line-height:1}
+.top nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:1;justify-content:center}
+.top nav button{border:0;background:transparent;color:var(--mute);font-size:13.5px;padding:6px 11px;border-radius:99px;white-space:nowrap}
+.top nav button.on{color:#fff;background:rgba(79,216,255,.14)}
+.navbtn{border:1px solid var(--line);background:rgba(79,216,255,.08);color:var(--ink);font-size:13px;padding:7px 12px;border-radius:99px;white-space:nowrap}
+.navbtn.hot{border-color:var(--amber);color:var(--amber);background:rgba(255,181,71,.08)}
+
+/* STAGE + BOOK */
+.stage{position:fixed;top:56px;bottom:58px;left:0;right:0;display:grid;place-items:center;z-index:1}
+#book{position:relative;width:calc(var(--pw) * 2);height:var(--ph);perspective:2800px}
+#book.single{width:var(--pw)}
+#book::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:60px;transform:translateX(-50%);pointer-events:none;z-index:8;background:linear-gradient(90deg,transparent,rgba(0,0,0,.55) 45%,rgba(0,0,0,.55) 55%,transparent);mix-blend-mode:multiply}
+#book.single::after{display:none}
+#book::before{content:"";position:absolute;inset:-10px -10px -18px;border-radius:20px;background:rgba(0,0,0,.45);filter:blur(22px);z-index:-1}
+.slot{position:absolute;top:0;width:var(--pw);height:100%}
+.slot.l{left:0}.slot.r{left:var(--pw)}
+#book.single .slot.l{display:none}#book.single .slot.r{left:0}
+.leaf{position:absolute;top:0;width:var(--pw);height:100%;transform-style:preserve-3d;z-index:10;will-change:transform}
+.leaf.fwd{left:var(--pw);transform-origin:left center}
+.leaf.bwd{left:0;transform-origin:right center}
+#book.single .leaf.fwd{left:0}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;transform:translateZ(.1px);box-shadow:0 20px 40px -12px rgba(0,0,0,.6)}
+.face.back{transform:rotateY(180deg) translateZ(.1px)}
+.face.back{transform:rotateY(180deg)}
+.face::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(0,0,0,.0),rgba(0,0,0,.45));opacity:0;transition:opacity var(--dur,.9s)}
+.leaf.go .face.front::after{opacity:1}
+.face.back::after{background:linear-gradient(270deg,rgba(0,0,0,0),rgba(0,0,0,.45));opacity:1}
+.leaf.go .face.back::after{opacity:0}
+.paperback{position:absolute;inset:0;background:linear-gradient(90deg,#0b1430,#060b1c);border-radius:0 14px 14px 0}
+
+/* PAGE */
+.page{position:absolute;inset:0;overflow-y:hidden;overflow-x:hidden;padding:30px 34px 40px;background:radial-gradient(120% 80% at 30% 0%,var(--paper2),var(--paper) 60%,#070d1e);border:1px solid var(--line);scrollbar-width:thin;scrollbar-color:rgba(140,190,255,.25) transparent}
+.page.L{border-radius:14px 0 0 14px;border-right:0}
+.page.R{border-radius:0 14px 14px 0;border-left:0}
+#book.single .page{border-radius:14px;border:1px solid var(--line)}
+.page .folio{position:absolute;bottom:12px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;color:var(--mute)}
+.page.L .folio{left:34px}.page.R .folio{right:34px}
+#book.single .page .folio{right:34px;left:auto}
+.page .run{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.16em;color:var(--mute);text-transform:uppercase}
+.page .run b{color:var(--accent);font-weight:600}
+.page.hl{box-shadow:inset 0 0 0 2px var(--amber)}
+.store{display:none}
+.corner{position:absolute;right:0;bottom:0;width:46px;height:46px;z-index:9;border:0;background:linear-gradient(135deg,transparent 50%,rgba(79,216,255,.35) 50%);border-radius:0 0 14px 0;opacity:.7}
+.corner:hover{opacity:1;width:56px;height:56px}
+.corner.back{left:0;right:auto;background:linear-gradient(225deg,transparent 50%,rgba(79,216,255,.35) 50%);border-radius:0 0 0 14px}
+
+/* BOTTOM CONTROLS */
+.ctrl{position:fixed;bottom:0;left:0;right:0;height:58px;z-index:50;display:flex;align-items:center;justify-content:center;gap:16px;padding:0 16px}
+.ctrl .pg{font-family:var(--f-mono);font-size:12.5px;color:var(--mute);letter-spacing:.12em;min-width:110px;text-align:center}
+.ctrl .bar{flex:0 1 380px;height:3px;border-radius:3px;background:rgba(255,255,255,.08);position:relative;overflow:hidden}
+.ctrl .bar i{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg,var(--cyan),var(--violet),var(--lime),var(--amber));transition:width .5s}
+.arrow{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:rgba(79,216,255,.08);color:#fff;font-size:20px;display:grid;place-items:center}
+.arrow:disabled{opacity:.3;cursor:default}
+.side{position:fixed;top:50%;transform:translateY(-50%);z-index:20}
+.side.l{left:14px}.side.r{right:14px}
+
+/* COMMON CONTENT */
+.card{background:rgba(14,24,48,.6);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative}
+.card h3{font-size:16.5px;font-weight:700;margin-bottom:4px;line-height:1.35}
+.card .meta{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:var(--accent);margin-bottom:6px}
+.card p{color:var(--soft);font-size:14px}
+.stack{display:grid;gap:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.lead{color:var(--soft);font-size:15px;line-height:1.7}
+.note{font-size:12px;color:var(--mute)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.h2{font-family:var(--f-display);font-weight:400;font-size:clamp(24px,3.6vh,34px);line-height:1.2;margin:4px 0 12px}
+.kicker{font-family:var(--f-mono);font-size:11px;letter-spacing:.16em;color:var(--accent);text-transform:uppercase}
+ul.clean{margin:6px 0 0;padding:0;list-style:none;display:grid;gap:5px;color:var(--soft);font-size:14px}
+ul.clean li{padding-left:14px;position:relative}
+ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;height:5px;border-radius:50%;background:var(--accent)}
+
+/* COVER */
+.cover{display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(90% 60% at 50% 105%,rgba(79,216,255,.26),transparent 60%),radial-gradient(120% 80% at 30% 0%,#0F1C3A,#060B1A 70%)!important}
+.cover h1{font-family:var(--f-display);font-weight:400;font-size:clamp(60px,11vh,112px);line-height:1;margin:18px 0 14px}
+.cover .en{font-family:var(--f-mono);letter-spacing:.24em;font-size:12px;color:#A9D8FF}
+.steps-line{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:34px}
+.steps-line div{border-top:2px solid var(--sc);padding-top:10px}
+.steps-line b{display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(18px,2.8vh,24px);color:#fff}
+.steps-line span{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;color:var(--sc)}
+.cover .rings{position:absolute;left:50%;bottom:-45%;width:150%;aspect-ratio:1;transform:translateX(-50%);pointer-events:none}
+.inner{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:14px}
+
+/* PROLOGUE + FLOW */
+.why{display:grid;gap:12px;margin-top:16px}
+.why>div{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:14px 0;border-top:1px solid var(--line)}
+.why>div>b{font-family:var(--f-mono);font-size:12px;color:var(--amber);padding-top:3px}
+.why p{color:var(--soft);font-size:14.5px}
+.why h3{font-size:16px;margin-bottom:2px}
+.arc{display:grid;gap:10px;margin-top:8px}
+.arc button{display:grid;grid-template-columns:54px 1fr;gap:14px;align-items:center;text-align:left;background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 16%,transparent),transparent 70%);border:1px solid color-mix(in srgb,var(--sc) 45%,transparent);border-radius:14px;padding:14px 16px;color:var(--ink)}
+.arc button:hover{background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 30%,transparent),transparent 80%)}
+.arc .hz{font-family:var(--f-display);font-size:34px;line-height:1;color:var(--sc);text-align:center}
+.arc .t{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.16em;color:var(--sc)}
+.arc h3{font-size:17px;margin:2px 0}
+.arc p{font-size:13px;color:var(--soft)}
+
+/* ACT OPENER */
+.opener{display:flex;flex-direction:column;justify-content:center;background:radial-gradient(80% 60% at 20% 100%,color-mix(in srgb,var(--accent) 22%,transparent),transparent 70%),radial-gradient(120% 80% at 30% 0%,var(--paper2),var(--paper) 60%,#070d1e)!important}
+.opener .hz{font-family:var(--f-display);font-size:clamp(120px,24vh,220px);line-height:.85;color:transparent;-webkit-text-stroke:1.5px var(--accent);opacity:.9}
+.opener .step{font-family:var(--f-mono);font-size:12px;letter-spacing:.24em;color:var(--accent);margin-top:18px}
+.opener h2{font-family:var(--f-display);font-weight:400;font-size:clamp(46px,8vh,76px);line-height:1;margin:6px 0 18px;color:#fff}
+.opener .thesis{font-size:clamp(17px,2.5vh,21px);font-weight:500;line-height:1.55;color:var(--ink);max-width:22em;border-left:3px solid var(--accent);padding-left:14px}
+.opener .badge{margin-top:22px}
+.badge{display:inline-flex;align-items:center;font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid var(--accent);color:var(--accent);background:rgba(0,0,0,.25);width:max-content}
+
+/* STORY BLOCKS */
+.titles{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.titles span{font-size:13px;padding:6px 11px;border-radius:99px;border:1px solid color-mix(in srgb,var(--accent) 40%,transparent);background:color-mix(in srgb,var(--accent) 7%,transparent);color:var(--ink)}
+.titles span.q{font-style:italic;color:var(--soft)}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0}
+.flow div{font-size:12.5px;text-align:center;padding:10px 6px;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line);position:relative}
+.flow div b{display:block;font-family:var(--f-mono);font-size:10px;color:var(--accent);letter-spacing:.1em}
+.rev{display:grid;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:10px}
+.rev div{padding:11px 14px;font-size:13.5px;color:var(--soft);display:grid;grid-template-columns:64px 1fr;gap:10px}
+.rev div+div{border-top:1px dashed var(--line)}
+.rev b{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:var(--mute);padding-top:2px}
+.rev div.q{background:rgba(79,216,255,.07)}.rev div.q b{color:var(--cyan)}
+.rev div.a{background:rgba(124,227,139,.06)}.rev div.a b{color:var(--lime)}.rev div.a{color:var(--ink)}
+.changed{margin-top:14px;padding:16px 18px;border-radius:14px;background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 18%,transparent),transparent 80%);border:1px solid color-mix(in srgb,var(--accent) 50%,transparent)}
+.changed .kicker{display:block;margin-bottom:6px}
+.changed p{font-size:15.5px;font-weight:500;color:#fff;line-height:1.6}
+.voice{font-size:14.5px;line-height:1.55;padding:13px 16px;border-radius:16px 16px 16px 5px;background:rgba(79,216,255,.07);border:1px solid rgba(79,216,255,.3)}
+.voice span{display:block;margin-top:4px;font-size:11px;color:var(--mute)}
+.topicset{display:grid;gap:10px;margin-top:8px}
+.topicset h4{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.14em;color:var(--accent);margin-bottom:5px;font-weight:600}
+.trio{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.trio div{padding:12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-size:13px;color:var(--soft)}
+.trio b{display:block;color:#fff;font-size:14px;margin-bottom:3px;line-height:1.35}
+.journey{display:grid;gap:0;margin-top:10px;position:relative}
+.journey::before{content:"";position:absolute;left:23px;top:24px;bottom:24px;width:2px;background:linear-gradient(var(--lime),var(--amber))}
+.journey div{display:grid;grid-template-columns:48px 1fr;gap:12px;align-items:center;padding:6px 0;position:relative}
+.journey i{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#07120b;border:2px solid var(--lime);font-style:normal;font-family:var(--f-mono);font-size:11px;color:var(--lime)}
+.journey b{display:block;font-size:14.5px}
+.journey span{font-size:13px;color:var(--soft)}
+.days4{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.days4 div{padding:12px;border-radius:12px;border:1px solid color-mix(in srgb,var(--dc) 70%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--dc) 28%,transparent),transparent 80%)}
+.days4 span{font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;color:#cfd9ff}
+.days4 b{display:block;font-family:var(--f-display);font-weight:400;font-size:19px;color:#fff;margin:2px 0}
+.days4 p{font-size:12.5px;color:var(--soft)}
+.gh-img{border-radius:12px;overflow:hidden;border:1px solid var(--line);position:relative}
+.gh-img img{width:100%;aspect-ratio:16/7;object-fit:cover}
+#rmap{width:100%;height:auto;display:block}
+#rmap text{font-family:var(--f-body);font-size:15px;fill:#DDE8FF}
+#ladder{width:100%;height:auto;max-height:36vh}
+.recap{display:grid;gap:8px;margin-top:10px}
+.recap div{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;border:1px solid color-mix(in srgb,var(--sc) 45%,transparent)}
+.recap b{font-family:var(--f-display);font-weight:400;font-size:28px;color:var(--sc);text-align:center}
+.recap p{font-size:14px;color:var(--ink)}
+.recap span{display:block;font-size:12px;color:var(--mute)}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.gb{display:flex;gap:6px;width:100%;max-width:420px;margin-top:10px}
+.gb input{flex:1;background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;border-radius:99px;padding:10px 14px;font-size:14px;font-family:inherit;min-width:0}
+.gb button{border:0;background:var(--cyan);color:#03121c;font-weight:700;border-radius:99px;padding:0 16px}
+.gb-list{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;max-width:440px}
+.gb-list span{font-size:12.5px;padding:5px 11px;border-radius:99px;background:rgba(79,216,255,.1);border:1px solid rgba(79,216,255,.3)}
+.ph{border:1px dashed color-mix(in srgb,var(--accent) 45%,transparent);border-radius:12px;min-height:70px;display:grid;place-items:center;text-align:center;color:var(--mute);font-size:12.5px;padding:12px}
+
+/* DRAWER + PASSPORT */
+.drawer{position:fixed;top:56px;right:0;bottom:0;width:min(420px,100%);z-index:60;background:rgba(6,10,24,.97);border-left:1px solid var(--line);padding:22px;overflow-y:auto;transform:translateX(100%);transition:transform .35s}
+.drawer.open{transform:none}
+.drawer h2{font-family:var(--f-display);font-weight:400;font-size:26px;margin:4px 0 6px}
+.rub{display:grid;gap:10px;margin-top:16px}
+.rub button{text-align:left;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--ink);border-radius:12px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:3px 12px}
+.rub button:hover{border-color:var(--amber)}
+.rub b{font-size:15px}
+.rub .pt{font-family:var(--f-display);font-size:22px;color:var(--amber);grid-row:span 2;align-self:center}
+.rub span{font-size:12.5px;color:var(--mute)}
+.close{position:absolute;top:12px;right:14px;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:99px;width:34px;height:34px;font-size:18px}
+.passport{position:fixed;right:16px;bottom:10px;z-index:55;display:flex;gap:6px;align-items:center;padding:8px 10px;border-radius:14px;background:rgba(10,14,34,.9);border:1px solid var(--line)}
+.passport .t{font-size:11px;color:var(--mute);margin-right:3px}
+.passport i{font-style:normal;width:22px;height:22px;border-radius:50%;border:1.5px dashed var(--sc);display:grid;place-items:center;font-family:var(--f-display);font-size:12px;color:var(--sc);transition:all .3s}
+.passport i.on{border-style:solid;background:var(--sc);color:#03121c;box-shadow:0 0 8px var(--sc)}
+
+@media (max-width:860px){.top nav{display:none}.side{display:none}.page{padding:24px 22px 40px}.passport .t{display:none}.navbtn.fs{display:none}.ctrl .bar{display:none}.trio,.flow{grid-template-columns:1fr 1fr}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+#track{position:absolute;inset:0;perspective:1800px;transform-style:preserve-3d}
+#track[hidden]{display:none}
+#track .page{transition:transform .65s cubic-bezier(.3,.7,.2,1),opacity .65s,filter .65s;transform-origin:center center;border-radius:14px!important;border:1px solid var(--line)!important;will-change:transform}
+#track .page.side-l,#track .page.side-r{cursor:pointer;filter:brightness(.7) saturate(.8);overflow:hidden}
+#track .page.side-l:hover,#track .page.side-r:hover{filter:brightness(.9)}
+#track .page.cur{box-shadow:0 30px 60px -20px rgba(0,0,0,.8),0 0 0 1px rgba(79,216,255,.15)}
+.stage{overflow:hidden}
+#book:not(.single) .slot.l .page{box-shadow:-3px 2px 0 -1px #0c1632,-6px 4px 0 -2px #0a1229,-9px 6px 0 -3px #08101f}
+#book:not(.single) .slot.r .page{box-shadow:3px 2px 0 -1px #0c1632,6px 4px 0 -2px #0a1229,9px 6px 0 -3px #08101f}
+@media (prefers-reduced-motion:reduce){#track .page{transition:none}}
+
+.shot{margin:12px 0 0;position:relative;transform:rotate(var(--tilt,-1deg));transition:transform .4s}
+.shot:hover{transform:rotate(0) scale(1.02)}
+.shot .frame{border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.18);background:#0b1430;box-shadow:0 20px 40px -16px rgba(0,0,0,.8)}
+.shot .chrome{height:18px;background:#1a2342;display:flex;gap:5px;align-items:center;padding:0 9px}
+.shot .chrome i{width:7px;height:7px;border-radius:50%;background:#3a4670}
+.shot .chrome i:first-child{background:#ff6b6b}.shot .chrome i:nth-child(2){background:#ffcc5c}.shot .chrome i:nth-child(3){background:#6bdc8a}
+.shot img{width:100%;display:block}
+
+.shot figcaption{font-size:11.5px;color:var(--mute);margin-top:7px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.evi{font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;padding:2px 7px;border-radius:99px;background:rgba(255,181,71,.15);color:var(--amber);border:1px solid rgba(255,181,71,.4)}
+.illus{margin-top:12px;border-radius:12px;overflow:hidden;border:1px solid var(--line);box-shadow:0 20px 40px -18px rgba(0,0,0,.8);transform:rotate(var(--tilt,1deg))}
+.illus img{width:100%;display:block}
+.opener{overflow:hidden}
+.opener .art{position:absolute;right:-6%;bottom:-4%;width:66%;opacity:.22;pointer-events:none;stroke:var(--accent);fill:none;stroke-width:1.2}
+.opener > *:not(.art){position:relative}
+.qrbox{display:flex;gap:12px;align-items:center;margin-top:12px;padding:12px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.qrbox .qr{width:92px;height:92px;flex:0 0 auto;background:#fff;border-radius:8px;padding:6px}
+.qrbox .qr canvas,.qrbox .qr img{width:100%!important;height:100%!important}
+.qrbox b{display:block;font-size:14px}
+.qrbox a{font-size:11.5px;word-break:break-all}
+.thumbs{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;margin-top:6px}
+.thumbs .shot{margin-top:10px}
+
+.thumbs h3{font-size:13.5px;margin-top:4px}
+
+#tabsIdx{position:absolute;left:calc(100% - 4px);top:20px;bottom:20px;display:flex;flex-direction:column;gap:6px;z-index:12}
+#tabsIdx button{flex:1;max-height:84px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;width:108px;padding:0 10px 0 14px;border:0;border-radius:0 6px 6px 0;clip-path:polygon(0 0,86% 0,100% 16%,100% 84%,86% 100%,0 100%);background:linear-gradient(180deg,color-mix(in srgb,var(--tc) 100%,#fff 0%),color-mix(in srgb,var(--tc) 82%,#000));color:#0a1020;text-align:left;font-family:var(--f-body);font-size:13px;font-weight:800;line-height:1.2;box-shadow:inset 8px 0 10px -6px rgba(0,0,0,.45),0 6px 14px -8px rgba(0,0,0,.7);filter:saturate(.75) brightness(.82);transform:translateX(-10px);transition:transform .25s,filter .25s}
+#tabsIdx button b{font-size:16px;font-weight:900;line-height:1.15;white-space:nowrap}
+#tabsIdx button span{font-size:10.5px;font-weight:600;opacity:.75}
+#tabsIdx button small{font-size:10.5px;font-weight:700;opacity:.7}
+#tabsIdx button:hover{transform:translateX(-4px);filter:none}
+#tabsIdx button.on{transform:translateX(6px);filter:brightness(1.12)}
+.page.R::after,#track .page.cur::after{content:"";position:absolute;top:0;right:0;bottom:0;width:6px;background:var(--edge,transparent);border-radius:0 14px 14px 0;opacity:.9}
+#book.single #tabsIdx button{width:68px;padding:0 4px 0 8px}
+#book.single #tabsIdx button span{display:none}
+#book.single #tabsIdx button b{font-size:11.5px}
+.side{display:none!important}
+
+
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.plan{all:unset;cursor:pointer;display:block;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#fff;transition:transform .2s,box-shadow .2s}
+.plan:hover,.plan:focus-visible{transform:translateY(-3px) rotate(-.6deg);box-shadow:0 14px 30px -12px rgba(0,0,0,.8);outline:2px solid #C9B98A}
+.plan img{width:100%;aspect-ratio:330/200;object-fit:cover;object-position:top;display:block}
+.plan span{display:block;background:#0f1830;color:var(--ink);font-size:12px;line-height:1.35;padding:7px 9px;min-height:44px}
+.plan span b{display:block;font-family:var(--f-mono);font-size:10px;color:#C9B98A}
+.plan.wide{margin-top:12px}.plan.wide img{aspect-ratio:330/150}
+.viewer{position:fixed;inset:0;z-index:90;background:rgba(3,6,15,.92);backdrop-filter:blur(6px);display:grid;grid-template-rows:auto 1fr;padding:14px}
+.viewer[hidden]{display:none}
+.viewer .vbar{display:flex;gap:10px;align-items:center;justify-content:space-between;color:var(--ink);padding:0 4px 10px}
+.viewer .vbar b{font-size:15px}
+.viewer .vbtns{display:flex;gap:8px}
+.viewer .vscroll{overflow:auto;display:flex;justify-content:center}
+.viewer .vscroll img{width:min(820px,100%);height:auto;border-radius:6px;box-shadow:0 20px 60px rgba(0,0,0,.6);align-self:flex-start}
+
+.cover h1.dream{white-space:nowrap;font-family:var(--f-display);font-weight:400;font-size:min(11vh,calc(var(--pw) * .19));letter-spacing:.06em;line-height:1;margin:16px 0 4px;text-shadow:0 0 30px rgba(79,216,255,.35)}
+.steps-line span{font-family:var(--f-display)!important;font-size:18px!important;letter-spacing:0!important}
+#tabsIdx button{max-height:74px}
+
+.trainhero{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.trainhero div{text-align:center;padding:14px 8px;border-radius:14px;border:1px solid rgba(154,168,255,.5);background:linear-gradient(160deg,rgba(154,168,255,.18),transparent)}
+.trainhero b{display:block;font-family:var(--f-display);font-weight:400;font-size:clamp(28px,4.6vh,40px);color:#fff;line-height:1.1}
+.trainhero span{font-size:12.5px;color:var(--soft)}
+.tcats{display:grid;gap:8px;margin-top:12px}
+.tcats div{padding:10px 12px;border-radius:10px;border-left:4px solid var(--cc);background:rgba(255,255,255,.03)}
+.tcats b{display:block;font-size:14px;color:#fff}.tcats span{font-size:12.5px;color:var(--soft)}
+.tleg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.tleg span{font-size:11.5px;color:var(--soft);display:flex;align-items:center;gap:5px}
+.tleg span::before{content:"";width:9px;height:9px;border-radius:50%;background:var(--cc)}
+.tlist{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+.tlist li{display:grid;grid-template-columns:44px 1fr 30px;gap:8px;align-items:center;padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.035);border-left:3px solid var(--cc);font-size:13px}
+.tlist .dt{font-family:var(--f-mono);font-size:11px;color:var(--mute)}
+.tlist .hr{font-family:var(--f-mono);font-size:11px;color:var(--cc);text-align:right}
+
+.intro{position:fixed;inset:0;z-index:100;background:#02040b;display:grid;place-items:center;transition:opacity .8s}
+.intro.out{opacity:0;pointer-events:none}
+.intro[hidden]{display:none}
+.intro video{width:100%;height:100%;object-fit:contain;background:#02040b}
+.intro .ibar{position:absolute;left:0;right:0;bottom:0;padding:18px 24px 22px;display:flex;align-items:center;gap:14px;background:linear-gradient(transparent,rgba(2,4,11,.85))}
+.intro .iprog{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden}
+.intro .iprog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#36C9B4,#4FB8FF,#9AA8FF,#7CE38B,#FFB547)}
+.intro .ibtn{border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;border-radius:99px;padding:9px 16px;font-size:14px;font-weight:700;white-space:nowrap;backdrop-filter:blur(6px)}
+.intro .ibtn.go{background:var(--cyan);color:#03121c;border-color:var(--cyan);box-shadow:0 0 24px rgba(79,216,255,.5)}
+.intro .itag{position:absolute;top:18px;left:22px;font-family:var(--f-mono);font-size:11px;letter-spacing:.2em;color:#A9D8FF}
+.intro .iplay{position:absolute;inset:0;margin:auto;width:max-content;height:max-content;font-size:18px;padding:16px 28px}
+@media (max-width:600px){.intro .ibar{flex-wrap:wrap;padding:12px}.intro .iprog{order:-1;flex-basis:100%}}
+
+.cvid{margin:14px 0 4px;border-radius:12px;overflow:hidden;border:1px solid rgba(140,190,255,.3);box-shadow:0 18px 40px -16px rgba(0,0,0,.9),0 0 30px -10px rgba(79,216,255,.5);background:#000}
+.cvid video{display:block;width:100%;aspect-ratio:16/9;max-height:34vh;object-fit:cover;background:#000}
+.cover .steps-line{margin-top:16px!important;gap:6px!important}
+.cover .steps-line b{white-space:nowrap;font-size:clamp(10.5px,calc(var(--pw) * .029),17px)!important}
+</style>
+</head>
+<body>
+<canvas id="sky" aria-hidden="true"></canvas>
+<div class="glow-top" aria-hidden="true"></div>
+
+<header class="top">
+  <button class="brand" data-go="cover"><small>INQUIRY WITHOUT WALLS</small>담장 없는 탐구</button>
+  <nav id="nav" aria-label="단계 이동"></nav>
+  <button class="navbtn hot" id="rubBtn" aria-expanded="false" aria-controls="drawer">평가 기준으로 보기</button>
+  <button class="navbtn" id="trailerBtn">예고편</button>
+  <button class="navbtn fs" id="fsBtn">전체화면</button>
+</header>
+
+<aside class="drawer" id="drawer" aria-label="평가 기준">
+  <button class="close" id="drawerClose" aria-label="평가 기준 닫기">×</button>
+  <p class="mono" style="color:var(--amber)">EVALUATION MAP</p>
+  <h2>평가 기준으로 보기</h2>
+  <p class="note">기승전결 네 단계가 평가 영역과 하나씩 맞물립니다. 항목을 누르면 그 단계로 넘어갑니다.</p>
+  <div class="rub" id="rub"></div>
+</aside>
+
+<div class="stage"><div id="book" aria-live="polite"><div class="slot l" id="slotL"></div><div class="slot r" id="slotR"></div></div></div>
+<button class="arrow side l" id="prevS" aria-label="이전 쪽">‹</button>
+<button class="arrow side r" id="nextS" aria-label="다음 쪽">›</button>
+<div class="ctrl"><button class="arrow" id="prev" aria-label="이전 쪽">‹</button><span class="pg" id="pg"></span><div class="bar" aria-hidden="true"><i id="barI"></i></div><button class="arrow" id="next" aria-label="다음 쪽">›</button></div>
+<div class="passport" id="passport" aria-label="지나온 단계"><span class="t">지나온 단계</span></div>
+
+<div class="viewer" id="viewer" hidden role="dialog" aria-modal="true" aria-label="계획서 예시안 보기"><div class="vbar"><b id="vTitle"></b><div class="vbtns"><button class="navbtn" id="vCopy" style="border-color:#C9B98A;color:#E9DDB4">글 복사</button><button class="navbtn" id="vPrev">‹ 이전</button><button class="navbtn" id="vNext">다음 ›</button><button class="navbtn hot" id="vClose">닫기 ✕</button></div></div><div class="vscroll" id="vScroll"><img id="vImg" alt=""></div></div>
+<div class="store" id="store">
+
+<article class="page L inner" data-id="inside" data-chap="cover" data-skip-single="1">
+  <svg viewBox="0 0 100 100" width="84" height="84" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="none" stroke="#FFB547" stroke-opacity=".35"/><circle cx="50" cy="50" r="33" fill="none" stroke="#7CE38B" stroke-opacity=".45"/><circle cx="50" cy="50" r="20" fill="none" stroke="#9B7BFF" stroke-opacity=".6"/><circle cx="50" cy="50" r="6" fill="#4FD8FF"/></svg>
+  <p class="mono" style="color:var(--cyan)">SONGRYE MIDDLE SCHOOL · 2026</p>
+  <p class="lead" style="max-width:30ch">2026 서울형 과학탐구 선도학교<br>송례중학교 성과 공유전</p>
+  <p class="note">오른쪽 아래 모서리를 누르거나 → 키로 넘겨 보세요</p>
+</article>
+
+<article class="page R cover" data-id="cover" data-chap="cover">
+  <svg class="rings" viewBox="0 0 200 200" aria-hidden="true"><g fill="none"><circle cx="100" cy="100" r="20" stroke="#36C9B4" stroke-opacity=".5"><animate attributeName="r" values="18;24;18" dur="5s" repeatCount="indefinite"/></circle><circle cx="100" cy="100" r="40" stroke="#4FB8FF" stroke-opacity=".3"/><circle cx="100" cy="100" r="62" stroke="#9AA8FF" stroke-opacity=".22"/><circle cx="100" cy="100" r="84" stroke="#FFB547" stroke-opacity=".16"/></g></svg>
+  <div style="position:relative">
+    <p class="mono" style="color:var(--cyan)">2026 서울형 과학탐구 선도학교 · 송례중학교</p>
+    <h1 class="dream"><span style="color:#36C9B4">D</span><span style="color:#4FB8FF">R</span><span style="color:#9AA8FF">E</span><span style="color:#7CE38B">A</span><span style="color:#FFB547">M</span></h1>
+    <p style="font-family:var(--f-display);font-size:clamp(26px,4.4vh,40px);margin:4px 0 6px"><span class="silver">담장 없는 탐구</span></p>
+    <p class="en">INQUIRY WITHOUT WALLS</p>
+    <div class="cvid"><video id="coverVid" src="assets/trailer.mp4" poster="assets/trailer_poster.jpg" muted playsinline loop controls preload="metadata" aria-label="송례중 DREAM 2026 예고편"></video></div>
+    <div class="steps-line" style="grid-template-columns:repeat(5,1fr)">
+      <div style="--sc:#36C9B4"><span>D</span><b style="font-size:clamp(14px,2vh,17px)">디지털 탐구</b></div><div style="--sc:#4FB8FF"><span>R</span><b style="font-size:clamp(14px,2vh,17px)">탐구 수업</b></div><div style="--sc:#9AA8FF"><span>E</span><b style="font-size:clamp(14px,2vh,17px)">교원 전문성</b></div><div style="--sc:#7CE38B"><span>A</span><b style="font-size:clamp(14px,2vh,17px)">지역 연계</b></div><div style="--sc:#FFB547"><span>M</span><b style="font-size:clamp(14px,2vh,17px)">성과 확산</b></div>
+    </div>
+  </div>
+  <p class="note" style="position:relative">송례중학교 과학탐구 선도학교 성과 공유전</p>
+</article>
+
+<article class="page L" data-id="prologue" data-chap="prologue" data-rub="plan" data-col="amber" style="--accent:var(--amber)">
+  <div class="run"><b>PROLOGUE</b><span class="badge">기획</span></div>
+  <h2 class="h2">DREAM,<br>담장을 허문 다섯 갈래의 길</h2>
+  <p class="lead" style="font-size:14px">송례중은 과학탐구 선도학교 운영 방향을 DREAM 다섯 가지로 세우고, 네 가지 추진 과제로 실천했습니다.</p>
+  <p class="kicker" style="margin-top:14px">네 가지 추진 과제</p>
+  <div class="why" style="margin-top:4px">
+    <div><b>01</b><div><h3>탐구 기반 환경 조성</h3><p>교육과정 연계 실험·관찰·자료 분석 및 디지털 탐구환경 활용</p></div></div>
+    <div><b>02</b><div><h3>학생 주도 탐구 활성화</h3><p>개별·공동탐구, 과학탐구동아리 및 심화탐구·체험 활동 확대</p></div></div>
+    <div><b>03</b><div><h3>진로·지역 연계 확장</h3><p>이공계 진로 탐색 및 설계 지원, 지역 내 과학탐구 자원 연계</p></div></div>
+    <div><b>04</b><div><h3>성과 공유 및 과학문화 확산</h3><p>교원 전문성 강화, 우수사례 공유 및 지역 중심 과학탐구 문화 조성</p></div></div>
+  </div>
+</article>
+
+<article class="page R" data-id="flowmap" data-chap="prologue" data-rub="plan" data-col="amber" style="--accent:var(--amber)">
+  <div class="run"><span>운영 방향</span><b>DREAM</b></div>
+  <h2 class="h2">다섯 개의 문으로<br>걸어 들어가기</h2>
+  <p class="lead" style="font-size:14px">문을 누르면 그 영역의 첫 쪽으로 넘어갑니다. 오른쪽 색인 탭으로도 언제든 이동할 수 있습니다.</p>
+  <div class="arc" id="arc"></div>
+</article>
+
+<article class="page L opener" data-id="D" data-chap="D" data-rub="must" data-col="teal" style="--accent:#36C9B4">
+  <svg class="art" viewBox="0 0 200 200" aria-hidden="true"><rect x="30" y="40" width="140" height="95" rx="8"/><path d="M80 160h40M100 135v25"/><path d="M48 115l25-28 22 18 25-35 30 22"/><circle cx="73" cy="87" r="3"/><circle cx="95" cy="105" r="3"/><circle cx="120" cy="70" r="3"/></svg>
+  <div class="hz">D</div>
+  <p class="step">DREAM · DIGITAL INQUIRY</p>
+  <h2 style="font-size:clamp(34px,6vh,58px);line-height:1.1">디지털 기반 탐구환경 활용</h2>
+  <p class="thesis">지능형 과학실과 디지털 기자재를 활용한 데이터 기반 탐구수업 운영</p>
+  <span class="badge">운영 · 필수 · 디지털 탐구 수업</span>
+</article>
+
+<article class="page R" data-id="q2" data-chap="D" data-rub="must" data-col="teal" style="--accent:#36C9B4">
+  <div class="run"><b>D · AI 탐구 코치</b><span>3학년 · 디지털 탐구</span></div>
+  <h2 class="h2">AI가 답 대신<br>질문을 돌려준 교실</h2>
+  <p class="lead" style="font-size:14px">3학년은 '운동과 에너지' 단원에서 AI 탐구 코치 '큐리'와 함께 롤러코스터의 에너지를 탐구했습니다. 큐리는 정답을 주지 않고 "어떤 에너지야?", "단위는?" 하고 되물었습니다.</p>
+  <div class="flow"><div><b>01</b>내 생각 먼저 쓰기</div><div><b>02</b>AI 질문 확인</div><div><b>03</b>다시 생각하기</div><div><b>04</b>수정하기</div></div>
+  <p class="kicker" style="margin-top:12px">한 학생의 탐구가 고쳐진 과정</p>
+  <div class="rev">
+    <div><b>처음</b><span>마찰이 궁금해서 롤러코스터 레일의 재질을 바꿔 보기로 했다.</span></div>
+    <div class="q"><b>큐리</b><span>재질만 바꾸면 마찰을 잴 수 없어. 무엇을 바꾸고(독립변인), 무엇을 잴지(종속변인) 정해 볼까?</span></div>
+    <div class="a"><b>고친 것</b><span>출발 높이를 같게 두고 탑승자의 질량을 바꾸며, 잃어버린 역학적 에너지가 레일의 온도 상승으로 나타나는지 측정하기로 했다.</span></div>
+  </div>
+  <p class="note" style="margin-top:8px">학생 소감을 바탕으로 이름 없이 다시 씀</p>
+</article>
+
+<article class="page L" data-id="qev1" data-chap="D" data-rub="must" data-col="teal" style="--accent:#36C9B4">
+  <div class="run"><b>EVIDENCE</b><span>3학년 · 학생마다 남긴 세 가지 기록</span></div>
+  <h2 class="h2">반마다 세 칸,<br>보고서·분석·코칭</h2>
+  <p class="lead" style="font-size:14px">3학년 탐구는 반별 패들렛에 최종 탐구보고서, 큐리 분석 리포트, 코칭 기록지 세 갈래로 모였습니다. 학생 한 명의 탐구가 쓰고, 분석받고, 다시 고쳐진 흔적이 그대로 남아 있습니다.</p>
+  <figure class="shot" style="--tilt:1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/padlet.jpg" alt="3학년 CURI 리포트 수집 패들렛 · 학생 이름은 가림"></div><figcaption><span class="evi">실제 운영 화면</span>3학년 CURI 리포트 수집 패들렛 · 학생 이름은 가림</figcaption></figure>
+</article>
+
+<article class="page R" data-id="dtools" data-chap="D" data-rub="must" data-col="teal" style="--accent:#36C9B4">
+  <div class="run"><span>디지털 탐구 환경</span><b>D · DIGITAL</b></div>
+  <h2 class="h2">탐구가 데이터로<br>남는 교실</h2>
+  <div class="stack">
+    <div class="card"><p class="meta">지능형 과학실 · B동 5층</p><h3>첨단 탐구 환경을 새로 열다</h3><p>디지털 기자재를 갖춘 지능형 과학실을 열고, 월간과학 소식지로 전교에 소개했습니다.</p></div>
+    <div class="card"><p class="meta">온라인 탐구보고서</p><h3>보고서를 디지털로 내고, 바로 확인하다</h3><p>2학년 탐구보고서를 온라인으로 제출하고, 교사는 반별 진행을 한눈에 보며 바로 피드백했습니다.</p></div>
+    <div class="card"><p class="meta">AI·디지털 체험 · 컨퍼런스 4일차</p><h3>AI와 코딩을 직접 다뤄 보다</h3><p>AI 프롬프트 연구소, 코딩 플레이존, AI 포토 스튜디오 부스에서 학생이 직접 체험을 안내했습니다.</p></div>
+  </div>
+  <div class="ph" style="margin-top:12px">지능형 과학실 수업 사진 자리</div>
+</article>
+
+<article class="page L opener" data-id="R" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
+  <svg class="art" viewBox="0 0 200 200" aria-hidden="true"><ellipse cx="100" cy="100" rx="14" ry="70"/><path d="M10 60h90l90 40M10 100h180M10 140h90l90-40"/><circle cx="145" cy="100" r="3"/><path d="M40 60v80M34 66l6-6 6 6"/></svg>
+  <div class="hz">R</div>
+  <p class="step">DREAM · RESEARCH LEARNING</p>
+  <h2 style="font-size:clamp(34px,6vh,58px);line-height:1.1">탐구 중심 수업 내실화</h2>
+  <p class="thesis">탐구 중심 수업 활성화를 통한 학생의 과학적 사고력 및 문제해결 역량 강화</p>
+  <span class="badge">운영 · 필수 · 선택1 · 탐구 수업과 학생 주도 탐구</span>
+</article>
+
+<article class="page R" data-id="qg" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><span>1 · 2 · 3학년</span><b>THREE GRADES</b></div>
+  <h2 class="h2">세 학년,<br>세 갈래의 탐구</h2>
+  <p class="lead" style="font-size:14px">학년마다 탐구의 모양은 달랐지만, 질문을 세우고 끝까지 답한다는 방향은 같았습니다.</p>
+  <div class="stack" style="margin-top:12px">
+    <div class="card" style="border-left:4px solid #9DBCCB"><p class="meta">1학년 · 탐구의 첫걸음</p><h3>기록하고, 관찰하고, 처음 참여하다</h3><p>성장여권으로 자기 탐구 이력을 쌓기 시작했고, 시드핸즈 프로젝트에서 교내 정원의 자생식물을 관찰했습니다. 가을 컨퍼런스에 가장 많이 신청한 학년도 1학년이었습니다.</p></div>
+    <div class="card" style="border-left:4px solid #4FD8FF"><p class="meta">2학년 · 실물 탐구</p><h3>열네 개 반 모두, 손으로 실험하고 보고서로</h3><p>'빛과 파동'에서 거울과 렌즈의 상을, '소화'에서 침의 소화 작용을 탐구해 보고서로 완성했습니다.</p></div>
+    <div class="card" style="border-left:4px solid #9B7BFF"><p class="meta">3학년 · 디지털 탐구</p><h3>AI 탐구 코치와 묻고 고치며</h3><p>'운동과 에너지'에서 큐리와 함께 탐구를 설계하고, 보고서·분석 리포트·코칭 기록을 남겼습니다.</p></div>
+  </div>
+</article>
+
+<article class="page L" data-id="qg1" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><b>GRADE 1</b><span>1학년 · 탐구의 첫 페이지</span></div>
+  <h2 class="h2">1학년,<br>탐구의 첫 페이지를 열다</h2>
+  <div class="stack">
+    <div class="card"><p class="meta">과학탐구 성장여권 · 7~12월</p><h3>첫 탐구부터 기록으로 남기다</h3><p>입학 첫해부터 행사·대회·수업 보고서를 인증 스티커로 모으며, 자기 탐구의 길을 스스로 기록했습니다.</p></div>
+    <div class="card"><p class="meta">시드핸즈 프로젝트 · 10~11월 · 1·2학년</p><h3>학교 정원에서 식물을 다시 보다</h3><p>식물의 구조와 표본을 관찰하고, 학교와 인근의 자생식물 해설을 들으며 씨앗을 거둘 준비를 했습니다.</p></div>
+    <div class="card"><p class="meta">사이언스·에코 컨퍼런스 · 10월</p><h3>가장 먼저 손을 든 학년</h3><p>나흘간의 컨퍼런스에 세 학년 중 가장 많이 신청해, 공연과 사진전, 포럼과 심포지엄을 함께했습니다.</p></div>
+    <div class="ph">1학년 정규 수업 탐구(단원·주제·보고서) 자료가 들어갈 자리</div>
+  </div>
+</article>
+
+<article class="page R" data-id="q1" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><span>2학년 · 실물 탐구</span><b>R · 2학년</b></div>
+  <h2 class="h2">거울과 렌즈 앞에서<br>각자 다른 질문을 품다</h2>
+  <p class="lead" style="font-size:14px">2학년 열네 개 반이 모두 '빛과 파동' 단원에서 거울과 렌즈를 직접 다뤘습니다. 같은 실험 도구 앞에서도 학생들이 붙인 탐구 제목은 저마다 달랐습니다.</p>
+  <div class="titles">
+    <span>거울의 생김새가 상에 미치는 영향</span><span>렌즈와 물체 사이의 거리에 따른 상의 모양과 크기 변화</span><span>볼록·오목 거울과 렌즈의 특징 비교 실험</span><span class="q">"볼록렌즈와 오목렌즈는 어떤 상을 만들까"</span><span>거울과 렌즈의 종류와 거리에 따른 상의 모양과 크기</span><span class="q">"거울이 튀어나오고 들어간 정도가 달라지면 상의 크기가 달라진다"</span></div>
+  <p class="lead" style="font-size:14px;margin-top:14px">가을에는 '소화' 단원에서 「침의 소화 작용」을 탐구했습니다. 두 단원 모두 실험으로 끝내지 않고 가설, 변인, 결과, 결론을 갖춘 탐구보고서로 마무리했습니다.</p>
+  <figure class="shot" style="--tilt:-1.2deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/dash.jpg" alt="탐구보고서 제출 대시보드 · 학생 정보는 가림"></div><figcaption><span class="evi">실제 운영 화면</span>탐구보고서 제출 대시보드 · 학생 정보는 가림</figcaption></figure>
+</article>
+
+<article class="page L" data-id="q3" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><span>학생의 목소리</span><b>WHAT CHANGED</b></div>
+  <h2 class="h2">"답지가 아니라<br>해설지였다"</h2>
+  <div class="stack">
+    <div class="voice">“AI는 답지인 줄 알았는데, 큐리를 통해 답지가 아니라 해설지라는 걸 알게 되었다.”<span>3학년 학생</span></div>
+    <div class="voice">“정답 대신 질문을 받으니 스스로 고민해서 얻은 지식이라 머릿속에 오래 남았다.”<span>3학년 학생</span></div>
+    <div class="voice">“평소엔 질문을 망설였는데, 궁금한 순간 바로 물어볼 수 있어 오답이 두렵지 않았다.”<span>3학년 학생</span></div>
+  </div>
+  <div class="changed">
+    <span class="kicker">그래서 달라진 것</span>
+    <p>결과만 적던 학생들이 측정값을 근거로 들고, 과학 원리로 '왜'를 설명하기 시작했습니다. 사후 설문에서 과학적 의사소통 여덟 항목이 모두 뚜렷하게 올랐고, 가장 크게 자란 것은 원리로 이유를 설명하는 힘이었습니다.</p>
+  </div>
+</article>
+
+<article class="page R" data-id="qev2" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><span>사후 설문 분석</span><b>EVIDENCE</b></div>
+  <h2 class="h2">수업 전과 후,<br>학생 스스로 답한 변화</h2>
+  <p class="lead" style="font-size:14px">같은 학생이 '수업 전의 나'와 '수업 후의 나'를 비교해 답했습니다. 용어, 단위, 자료 해석, 근거, 원리, 설명 순서, 수정, 전달까지 모든 항목이 함께 올랐습니다.</p>
+  <figure class="shot" style="--tilt:-1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/survey2.jpg" alt="사후 설문 분석 도구 · 수업 전후 비교"></div><figcaption><span class="evi">실제 운영 화면</span>사후 설문 분석 도구 · 수업 전후 비교</figcaption></figure>
+  <figure class="shot" style="--tilt:1.4deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/survey1.jpg" alt="반별 응답 현황"></div><figcaption><span class="evi">실제 운영 화면</span>반별 응답 현황</figcaption></figure>
+</article>
+
+<article class="page L" data-id="d1" data-chap="R" data-rub="opt1" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><span>동아리 연구 → 시민 앞으로</span><b>R · 동아리 연구</b></div>
+  <h2 class="h2">교실 밖에서<br>시민에게 설명하다</h2>
+  <p class="lead" style="font-size:14px">봄, 국립중앙과학관 제55회 사이언스데이. 두 동아리가 자기 연구를 체험 부스로 만들어 시민 앞에 섰습니다.</p>
+  <div class="card" style="margin-top:12px">
+    <p class="meta">어스 아키텍트 · 기후환경</p>
+    <h3>「도시의 온도를 낮춰라!」 테라리움으로 만드는 Cool Village</h3>
+    <p>테라리움으로 도시 모형을 짓고, 녹지 비율과 지표면, 토양 수분을 바꿔 가며 적외선 온도계로 표면 온도를 쟀습니다. 측정 결과로 가장 시원한 도시를 설계해 보이는 열섬 탐구입니다.</p>
+  </div>
+  <div class="card" style="margin-top:10px">
+    <p class="meta">ATGC · 생명과학</p>
+    <h3>「3글자의 비밀, 생명의 암호를 해독하라!」</h3>
+    <p>DNA의 정보가 RNA를 거쳐 단백질이 되는 과정을 교구로 풀어내고, 코돈표로 '오류 찾기 게임'과 '단백질 만들기 미션'을 설계했습니다. 시약 없이 누구나 참여하는 체험으로 만든 것이 특징입니다.</p>
+  </div>
+</article>
+
+<article class="page R" data-id="d2" data-chap="R" data-rub="opt1" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><b>R · 학생 연구</b><span>학생과학탐구</span></div>
+  <h2 class="h2">끝까지 붙든 질문들</h2>
+  <p class="lead" style="font-size:14px">교과에서 시작한 궁금증이 학생 스스로 설계한 연구가 되었습니다. 가을 심포지엄에서 발표한 학생 연구의 질문들입니다.</p>
+  <div class="topicset">
+    <div><h4>에너지를 아끼는 생활</h4><div class="titles"><span>차량 이동과 에너지를 고려한 최적 신호제어</span><span>승강기 균형추 질량과 에너지 사용량</span><span>동작감지 에너지 전원 차단기</span><span>온·습도 센서로 본 냉방 방법별 소비전력</span><span>수소 연소를 이용한 발전 설비 설계</span></div></div>
+    <div><h4>생활 속 화학과 생명</h4><div class="titles"><span>물의 양에 따른 치약의 중화 효과</span><span>콜라와 멘토스 탄산 누출</span><span>당의 종류에 따른 효모 발효</span><span>안토시아닌 지시약 필름으로 식품 부패도 측정</span></div></div>
+    <div><h4>하늘과 공기에 대한 질문</h4><div class="titles"><span class="q">하늘은 왜 파란색일까?</span><span class="q">구름에도 이름이 있다고?</span><span class="q">미세먼지는 얼마나 작을까?</span><span class="q">날씨와 기후는 같은 말일까?</span><span class="q">지구를 감싸는 보이지 않는 담요</span></div></div>
+  </div>
+</article>
+
+<article class="page L" data-id="d3" data-chap="R" data-rub="opt1" data-col="sky" style="--accent:#4FB8FF">
+  <div class="run"><span>바다, 밤하늘, 그리고 매일</span><b>R · 학생 주도</b></div>
+  <h2 class="h2">탐구가<br>일상이 되기까지</h2>
+  <div class="stack">
+    <div class="card"><p class="meta">과학캠프 · 6월 · 강릉원주대 해양과학교육원</p><h3>살아 있는 바다를 현미경으로</h3><p>플랑크톤을 현미경으로 들여다보고, 어류와 무척추동물을 관찰하고, 밤에는 별을 보고, 경포대 바닷가에서 해양을 탐구했습니다.</p></div>
+    <div class="card"><p class="meta">과학탐구 성장여권 · 7~12월 · 전교생</p><h3>탐구 이력을 스스로 쌓는 여권</h3><p>행사, 대회, 수업 보고서마다 인증 스티커를 모으고 레벨을 올리며 자기 탐구의 길을 기록합니다.</p></div>
+      </div>
+  <div class="changed"><span class="kicker">그래서 달라진 것</span><p>과학이 수업 시간에만 있는 과목이 아니라, 학교의 일상이 되었습니다.</p></div>
+</article>
+
+<article class="page R opener" data-id="E" data-chap="E" data-rub="opt2" data-col="peri" style="--accent:#9AA8FF">
+  <svg class="art" viewBox="0 0 200 200" aria-hidden="true"><path d="M30 60c25-12 50-12 70 4 20-16 45-16 70-4v100c-25-12-50-12-70 4-20-16-45-16-70-4z"/><path d="M100 64v100"/><path d="M45 85c15-5 30-5 42 2M45 105c15-5 30-5 42 2M113 87c12-7 27-7 42-2M113 107c12-7 27-7 42-2"/></svg>
+  <div class="hz">E</div>
+  <p class="step">DREAM · EDUCATOR EXPERTISE</p>
+  <h2 style="font-size:clamp(34px,6vh,58px);line-height:1.1">교원 전문성 강화</h2>
+  <p class="thesis">교사연구회, 전문 연수 참여를 통해 탐구 중심 역량을 강화 및 탐구 지도 전문성 제고</p>
+  <span class="badge">운영 · 선택2 · 교원 전문성</span>
+</article>
+
+
+<article class="page L" data-id="Etrain" data-chap="E" data-rub="opt2" data-col="peri" style="--accent:#9AA8FF">
+  <div class="run"><b>E · 직무연수</b><span>6월 ~ 10월</span></div>
+  <h2 class="h2">과학교사 여섯 명,<br>모두 함께 배우다</h2>
+  <div class="trainhero">
+    <div><b>6명</b><span>신청한 과학교사 전원</span></div>
+    <div><b>100%</b><span>이수</span></div>
+    <div><b>30시간</b><span>관련 직무연수</span></div>
+  </div>
+  <p class="lead" style="font-size:14px;margin-top:14px">학생에게 탐구를 가르치기 전에, 선생님들이 먼저 탐구했습니다. 생성형 AI로 웹앱을 만들고, 서울숲에서 생물다양성을 조사하고, 스마트망원경으로 별을 관측하고, MBL로 데이터를 모았습니다.</p>
+  <div class="tcats">
+    <div style="--cc:#36C9B4"><b>AI·디지털·데이터</b><span>바이브코딩 웹앱, AI 교육 앱 설계, 마인크래프트, MBL 실습과 성과 공유, 지능형과학실 컨설팅</span></div>
+    <div style="--cc:#7CE38B"><b>생물다양성·생태</b><span>서울숲 현장탐사, S.E.E.D. 생물다양성 프로젝트</span></div>
+    <div style="--cc:#9AA8FF"><b>천체관측</b><span>스마트망원경 활용 관측</span></div>
+    <div style="--cc:#FFB547"><b>융합·독서</b><span>과천과학관 창의융합 탐방, 탐구 독서</span></div>
+  </div>
+</article>
+<article class="page R" data-id="Etrain2" data-chap="E" data-rub="opt2" data-col="peri" style="--accent:#9AA8FF">
+  <div class="run"><span>연수 주제 11가지</span><b>TRAINING</b></div>
+  <h2 class="h2">배운 것이<br>그대로 수업이 되다</h2>
+  <div class="tleg"><span style="--cc:#36C9B4">AI·디지털·데이터</span><span style="--cc:#7CE38B">생물다양성·생태</span><span style="--cc:#9AA8FF">천체관측</span><span style="--cc:#FFB547">융합·독서</span></div>
+  <ol class="tlist"><li style="--cc:#36C9B4"><span class="dt">6.26</span><span class="tt">생성형 AI를 활용한 바이브코딩: 기초 웹앱 제작</span><span class="hr">2h</span></li><li style="--cc:#7CE38B"><span class="dt">6.27</span><span class="tt">현장탐사형 생물다양성 탐구 프로젝트 (서울숲)</span><span class="hr">5h</span></li><li style="--cc:#36C9B4"><span class="dt">7.13</span><span class="tt">수업 데이터 수집·분석 기반 AI 교육 애플리케이션 설계</span><span class="hr">3h</span></li><li style="--cc:#36C9B4"><span class="dt">7.15</span><span class="tt">마인크래프트 기반 탐구 프로젝트</span><span class="hr">2h</span></li><li style="--cc:#FFB547"><span class="dt">7.24</span><span class="tt">과학적 사고와 탐구를 키우는 독서 활용</span><span class="hr">2h</span></li><li style="--cc:#7CE38B"><span class="dt">8.14</span><span class="tt">S.E.E.D. 생물다양성 탐구 프로젝트</span><span class="hr">2h</span></li><li style="--cc:#9AA8FF"><span class="dt">9.2</span><span class="tt">스마트망원경을 활용한 천체관측</span><span class="hr">3h</span></li><li style="--cc:#36C9B4"><span class="dt">9.7</span><span class="tt">MBL 활용 데이터 기반 화학탐구 실습</span><span class="hr">2h</span></li><li style="--cc:#FFB547"><span class="dt">9.19</span><span class="tt">창의융합형 과학교육 탐방 (과천과학관)</span><span class="hr">5h</span></li><li style="--cc:#36C9B4"><span class="dt">10.26</span><span class="tt">미래형 과학탐구수업을 위한 MBL 성과 공유</span><span class="hr">2h</span></li><li style="--cc:#36C9B4"><span class="dt">10.30</span><span class="tt">과학탐구 선도학교·지능형과학실 컨설팅 (사후 평가)</span><span class="hr">2h</span></li></ol>
+  <div class="changed" style="margin-top:12px"><span class="kicker">수업으로 이어진 연수</span><p>AI·데이터 연수는 큐리와 디지털 탐구보고서로, 생물다양성 연수는 씨앗 채종과 하천 생태 탐구로, 천체관측 연수는 밤하늘 관측 활동으로 이어졌습니다.</p></div>
+</article>
+
+<article class="page L" data-id="backstage" data-chap="E" data-rub="opt2" data-col="peri" style="--accent:#9AA8FF">
+  <div class="run"><b>E · EDUCATOR</b><span class="badge">운영 · 선택2</span></div>
+  <h2 class="h2">탐구 도구를<br>직접 만든 선생님들</h2>
+  <p class="lead" style="font-size:14px">선생님들은 수업과 행사에 필요한 도구를 직접 만들었습니다. 이 도구들은 그대로 다른 학교와 나눌 수 있는 자료가 됩니다.</p>
+  <div class="thumbs">
+    <div><figure class="shot" style="--tilt:-1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/dash.jpg" alt="탐구보고서 대시보드"></div><figcaption><span class="evi">실제 운영 화면</span>탐구보고서 대시보드</figcaption></figure></div>
+    <div><figure class="shot" style="--tilt:1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/survey1.jpg" alt="사후 설문 분석 도구"></div><figcaption><span class="evi">실제 운영 화면</span>사후 설문 분석 도구</figcaption></figure></div>
+    <div><figure class="shot" style="--tilt:.8deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/confreg.jpg" alt="컨퍼런스 신청 시스템"></div><figcaption><span class="evi">실제 운영 화면</span>컨퍼런스 신청 시스템</figcaption></figure></div>
+    <div class="ph" style="margin-top:10px;min-height:120px">AI 탐구 코치 큐리<br>화면 캡처 자리</div>
+  </div>
+  <div class="ph" style="margin-top:10px">교사연구회 활동 기록과 타 학교 공유 실적이 들어갈 자리</div>
+</article>
+
+<article class="page R" data-id="E2" data-chap="E" data-rub="opt2" data-col="peri" style="--accent:#9AA8FF">
+  <div class="run"><span>먼저 배우는 선생님</span><b>E · EDUCATOR</b></div>
+  <h2 class="h2">선생님이 먼저 배우고,<br>함께 설계하다</h2>
+  <div class="stack">
+    <div class="card"><p class="meta">교직원 생태전환 연수 · 10월</p><h3>학생보다 먼저 정원에 서다</h3><p>외부 식물 전문가를 초청해 식물의 구조와 표본을 관찰하고, 학교와 인근 자생식물 해설을 들었습니다. 학생 씨앗 채종 프로젝트의 첫 단계였습니다.</p></div>
+    <div class="card"><p class="meta">공동 수업 설계</p><h3>과학교사 여섯 명이 한 팀으로</h3><p>지역 초등학생 초청 융합과학교실의 세 프로그램을 두 명씩 나누어 맡고, 두 반이 교차하도록 함께 설계했습니다.</p></div>
+    <div class="card"><p class="meta">협의 체계</p><h3>계획하고, 되돌아보다</h3><p>컨퍼런스 사전 협의회와 평가 협의회로 운영을 함께 준비하고 결과를 나눴습니다.</p></div>
+  </div>
+  
+</article>
+
+<article class="page L opener" data-id="A" data-chap="A" data-rub="opt3" data-col="lime" style="--accent:#7CE38B">
+  <svg class="art" viewBox="0 0 200 200" aria-hidden="true"><path d="M100 120V70M100 90c-20 0-30-15-30-35 20 0 30 15 30 35zM100 78c0-20 10-35 30-35 0 20-10 35-30 35z"/><path d="M40 140c20-5 40-5 60 0s40 5 60 0M30 160c25 10 50 12 70 10s45-12 70-12M60 140l10 30M140 140l-10 30"/></svg>
+  <div class="hz">A</div>
+  <p class="step">DREAM · ACTIVE PARTNERSHIP</p>
+  <h2 style="font-size:clamp(34px,6vh,58px);line-height:1.1">지역 연계 교육 강화</h2>
+  <p class="thesis">과학 진로체험 및 지역사회 협력 프로그램 운영을 통한 탐구 기회 확대</p>
+  <span class="badge">운영 · 선택3 · 성과(이공계 진로)</span>
+</article>
+
+<article class="page R" data-id="s1" data-chap="A" data-rub="opt3" data-col="lime" style="--accent:#7CE38B">
+  <div class="run"><span>5월 · 위례새솔어린이집</span><b>A · 유아</b></div>
+  <h2 class="h2">「미래에게 건네는,<br>작은 손의 씨앗 한 알」</h2>
+  <p class="lead" style="font-size:14px">어린이집 옆 근린공원. 생태전환 동아리 '송그린' 중학생들이 여섯, 일곱 살 아이들의 선생님이 되었습니다. 세 모둠이 각자 수업을 짜서 직접 진행했습니다.</p>
+  <div class="trio">
+    <div><b>뚝딱뚝딱! 분리배출 놀이</b>깨끗한 지구를 만드는 첫 습관</div>
+    <div><b>작은 씨앗, 큰 약속</b>아이 손에 씨앗 한 알을 건네며</div>
+    <div><b>쑥쑥 씨앗 키우기</b>집에 가서도 이어지는 돌봄</div>
+  </div>
+  <div class="changed"><span class="kicker">아이들 앞에 선 중학생</span><p>환경을 배우던 학생들이, 어린이의 눈높이로 다시 설명하며 자기 지식을 한 번 더 다졌습니다.</p></div>
+</article>
+
+<article class="page L" data-id="s2" data-chap="A" data-rub="opt3" data-col="lime" style="--accent:#7CE38B">
+  <div class="run"><b>A · 초등</b><span>7월 · 송례과학챌린지</span></div>
+  <h2 class="h2">선배와 함께 배운<br>초등학생의 하루</h2>
+  <p class="lead" style="font-size:14px">이웃 송례초와 위례별초 6학년을 학교로 초대해 중학생과 한 모둠으로 STEAM 융합과학교실을 열었습니다.</p>
+  <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:12px;margin-top:12px;align-items:start">
+    <img src="assets/challenge_poster.jpg" alt="송례과학챌린지 STEAM 융합과학교실 홍보 포스터" style="border-radius:10px;border:1px solid var(--line)">
+    <ul class="clean" style="gap:10px">
+      <li><b>실생활 속 생체모방기술</b><br>자연의 구조에서 기술의 아이디어 찾기</li>
+      <li><b>스마트 모빌리티</b><br>센서와 코딩으로 나만의 자율주행 자동차</li>
+      <li><b>송례CSI 과학수사대</b><br>과학으로 단서를 찾는 사건 해결</li>
+    </ul>
+  </div>
+</article>
+
+<article class="page R" data-id="s3" data-chap="A" data-rub="opt3" data-col="lime" style="--accent:#7CE38B">
+  <div class="run"><span>4월 → 11월</span><b>A · 씨앗</b></div>
+  <h2 class="h2">씨앗 한 알의 여행</h2>
+  <p class="lead" style="font-size:14px">학교에서 나눈 씨앗이 마을의 아이들에게 건너가고, 마지막에는 나라의 씨앗 금고에 닿았습니다.</p>
+  <div class="journey">
+    <div><i>학교</i><p><b>송례 씨앗은행</b><span>허브 모종을 빌려 키우고, 거둔 씨앗을 다시 반납하는 순환</span></p></div>
+    <div><i>마을</i><p><b>어린이집의 작은 손</b><span>중학생이 아이들에게 건넨 씨앗과 약속</span></p></div>
+    <div><i>산</i><p><b>대모산 자생식물 채종</b><span>시드핸즈 프로젝트, 씨앗을 직접 거두고 일지를 쓰다</span></p></div>
+    <div><i>나라</i><p><b>백두대간 글로벌 시드볼트</b><span>정선·건조·포장을 거쳐 송례의 씨앗을 기탁</span></p></div>
+  </div>
+  <div class="card" style="margin-top:12px"><p class="meta">세계로 · 10월 · UN SDGs 청소년 에코 포럼</p><p>위례의 하천과 습지에서 시작한 질문을 들고, 서울여대 기후·환경동아리 대학생들과 국제 환경 의제를 토론했습니다.</p></div>
+</article>
+
+<article class="page L" data-id="c1" data-chap="A" data-rub="out" data-col="lime" style="--accent:#7CE38B">
+  <div class="run"><span>7월 · 졸업생 이공계 멘토</span><b>A · 진로</b></div>
+  <h2 class="h2">「감사로 이어진<br>송례공동체」</h2>
+  <p class="lead" style="font-size:14px">송례중을 졸업하고 과학고를 거쳐 KAIST에 진학한 선배가 후배들 앞에 섰습니다. 선배는 이 학교에서 했던 실험과 동아리 경험이 어떻게 진학의 바탕이 되었는지, 지금의 선도학교 프로그램을 어떻게 쓰면 좋은지 들려주었습니다. 이 자리에는 강동송파영재교육원 학생들도 함께했습니다.</p>
+  <svg id="ladder" viewBox="0 0 420 330" role="img" aria-label="송례중에서 과학고, KAIST로 이어지고 다시 후배에게 돌아오는 길">
+    <defs><linearGradient id="lg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#4FD8FF"/><stop offset="1" stop-color="#FFB547"/></linearGradient><marker id="ar" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#FFB547"/></marker></defs>
+    <g font-family="Noto Sans KR" font-weight="700" font-size="16" fill="#fff">
+      <rect x="20" y="250" width="200" height="50" rx="12" fill="rgba(79,216,255,.14)" stroke="#4FD8FF"/><text x="42" y="281">송례중학교</text>
+      <rect x="70" y="160" width="200" height="50" rx="12" fill="rgba(120,200,220,.12)" stroke="#8FD3E8"/><text x="92" y="191">과학고등학교</text>
+      <rect x="120" y="70" width="200" height="50" rx="12" fill="rgba(255,181,71,.16)" stroke="#FFB547"/><text x="142" y="101">KAIST</text>
+    </g>
+    <path d="M120 250 L160 210 M170 160 L210 120" stroke="url(#lg)" stroke-width="3" fill="none" stroke-dasharray="6 6"><animate attributeName="stroke-dashoffset" values="24;0" dur="1s" repeatCount="indefinite"/></path>
+    <path d="M330 95 C410 170 380 290 228 285" stroke="#FFB547" stroke-width="2" fill="none" marker-end="url(#ar)" stroke-dasharray="4 5"/>
+    <text x="352" y="210" font-family="Noto Sans KR" font-size="13" fill="#FFD08A" text-anchor="middle">선배가 되어</text><text x="352" y="228" font-family="Noto Sans KR" font-size="13" fill="#FFD08A" text-anchor="middle">후배에게</text>
+  </svg>
+</article>
+
+<article class="page R" data-id="c2" data-chap="A" data-rub="out" data-col="lime" style="--accent:#7CE38B">
+  <div class="run"><b>A · 진로</b><span>진로가 보이는 자리</span></div>
+  <h2 class="h2">연구자의 자리에<br>미리 서 보다</h2>
+  <div class="stack">
+    <div class="card"><p class="meta">8월 · 서울대학교</p><h3>캠퍼스를 걷고, 대학생에게 묻다</h3><p>조별로 캠퍼스를 돌아보고 이공계 대학생 멘토에게 공부와 진로를 직접 물었습니다.</p></div>
+    <div class="card"><p class="meta">10월 · 과학드림 토크콘서트</p><h3>과학을 전하는 직업을 만나다</h3><p>과학 크리에이터에게 과학을 즐기고 알리는 진로를 들었습니다.</p></div>
+    <div class="card"><p class="meta">10월 · 녹색일자리 탐색</p><h3>환경을 지키는 일자리를 알아보다</h3><p>자원순환교육과 함께 Green Job의 세계를 탐색했습니다.</p></div>
+    <div class="card"><p class="meta">10월 · 주니어 심포지엄</p><h3>연구자처럼 발표하고 질문받다</h3><p>영재교육원 학생들과 같은 무대에서 자기 연구를 포스터로 발표했습니다.</p></div>
+  </div>
+</article>
+
+<article class="page L opener" data-id="M" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
+  <svg class="art" viewBox="0 0 200 200" aria-hidden="true"><circle cx="100" cy="100" r="10"/><circle cx="100" cy="100" r="34"/><circle cx="100" cy="100" r="60"/><circle cx="100" cy="100" r="88"/></svg>
+  <div class="hz">M</div>
+  <p class="step">DREAM · MULTIPLYING IMPACT</p>
+  <h2 style="font-size:clamp(34px,6vh,58px);line-height:1.1">운영성과 공유·확산</h2>
+  <p class="thesis">탐구수업 우수사례 공유를 통한 과학교육 내실화 및 과학탐구 문화 조성</p>
+  <span class="badge">운영 · 선택3 · 우수사례 공유·확산</span>
+</article>
+
+<article class="page R" data-id="s4" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
+  <div class="run"><b>M · 컨퍼런스</b><span>10.14 – 10.17</span></div>
+  <h2 class="h2">마을에 문을 연 나흘,<br>사이언스·에코 컨퍼런스</h2>
+  
+  <div style="display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;align-items:start"><div class="illus" style="--tilt:-1.5deg;margin-top:0"><img src="assets/conf_poster.jpg" alt="2026 송례 STEP-IN 주니어 사이언스·에코 컨퍼런스 포스터"></div><div class="days4" style="grid-template-columns:1fr;margin-top:0">
+    <div style="--dc:var(--d1)"><span>DAY 1 · INSIGHT</span><b>만나다</b><p>오케스트라 공연과 과학드림의 진로 토크콘서트</p></div>
+    <div style="--dc:var(--d2)"><span>DAY 2 · ARCHIVE</span><b>기록하다</b><p>가을 하늘·구름 사진전, 자원순환과 녹색일자리</p></div>
+    <div style="--dc:var(--d3)"><span>DAY 3 · ACTION</span><b>실천하다</b><p>위례 습지 생물다양성 사진전, UN SDGs 포럼</p></div>
+    <div style="--dc:var(--d4)"><span>DAY 4 · SYMPOSIUM</span><b>공유하다</b><p>학생·영재교육원 연구 발표와 체험랩, 학부모와 이웃 초등학생에게 공개</p></div>
+  </div></div>
+</article>
+
+<article class="page L" data-id="s4b" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
+  <div class="run"><span>10.17 · 운동장</span><b>SYMPOSIUM</b></div>
+  <h2 class="h2">운동장에 펼친<br>주니어 심포지엄</h2>
+  <p class="lead" style="font-size:14px">학생과 영재교육원의 연구 포스터가 운동장을 둘러싸고, 가운데는 학부모와 이웃 초등학생이 오가는 관람 길로 비워 두었습니다. 체험부스에서는 중학생이 직접 실험을 안내했습니다.</p>
+  <div class="illus" style="--tilt:.8deg"><img src="assets/layout.jpg" alt="K-STEM 심포지엄 운동장 배치도 일러스트"></div>
+  <p class="note" style="margin-top:8px">심포지엄 배치도 · 영재교육원 포스터 발표존, 학생 포스터 테이블, 체험부스, 사진전</p>
+</article>
+
+<article class="page R" data-id="sev" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
+  <div class="run"><b>EVIDENCE</b><span>컨퍼런스를 직접 열어 보세요</span></div>
+  <h2 class="h2">학생과 학부모가<br>직접 신청한 컨퍼런스</h2>
+  <div class="thumbs">
+    <div><figure class="shot" style="--tilt:-1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/confhome.jpg" alt="컨퍼런스 홈페이지"></div><figcaption><span class="evi">실제 운영 화면</span>컨퍼런스 홈페이지</figcaption></figure></div>
+    <div><figure class="shot" style="--tilt:1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/confreg.jpg" alt="참가 신청 페이지"></div><figcaption><span class="evi">실제 운영 화면</span>참가 신청 페이지</figcaption></figure></div>
+  </div>
+  <figure class="shot" style="--tilt:-.6deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/confadmin.jpg" alt="신청 현황판 · 신청자 이름은 가림"></div><figcaption><span class="evi">실제 운영 화면</span>신청 현황판 · 신청자 이름은 가림</figcaption></figure>
+  <div class="g2" style="margin-top:12px">
+    <div class="qrbox"><div class="qr" data-qr="https://barbieeyes.github.io/2026conference/"></div><div><b>컨퍼런스 홈페이지</b><a href="https://barbieeyes.github.io/2026conference/" target="_blank" rel="noopener">예고편과 일정</a></div></div>
+    <div class="qrbox"><div class="qr" data-qr="https://songrye-conf-2026.vercel.app/"></div><div><b>참가 신청 페이지</b><a href="https://songrye-conf-2026.vercel.app/" target="_blank" rel="noopener">프로그램 안내</a></div></div>
+  </div>
+</article>
+
+<article class="page L" data-id="mag" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
+  <div class="run"><b>M · SHARE</b><span>월간과학 · 7~12월</span></div>
+  <h2 class="h2">학교 전체가<br>함께 읽는 과학</h2>
+  <p class="lead" style="font-size:14px">「송례 과학 디스커버리」는 학교의 탐구 성과를 전교생과 교직원에게 매달 알리는 소식지입니다. 매월 같은 코너 틀로 꾸준히 발행했습니다.</p>
+  <div class="stack" style="margin-top:12px">
+    <div class="card"><p class="meta">송례 과학 뉴스</p><p>지능형 과학실 오픈, 학년별 탐구 성공 사례</p></div>
+    <div class="card"><p class="meta">이달의 과학 행사 · 이달의 과학자</p><p>캠프 성과와 다음 행사 안내, 켈빈 경과 절대온도 이야기</p></div>
+    <div class="card"><p class="meta">이달의 밤하늘 · 이달의 과학 명언</p><p>여름철 대삼각형 관측 시기, 호기심을 여는 한마디</p></div>
+  </div>
+  <div class="ph" style="margin-top:12px">발행된 소식지 표지 이미지 자리</div>
+</article>
+
+<article class="page R" data-id="s5" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
+  <div class="run"><span>송례에서 이어진 곳들</span><b>RIPPLE</b></div>
+  <svg id="rmap" viewBox="-130 0 860 600" role="img" aria-label="송례중학교를 중심으로 마을, 서울, 전국, 세계로 이어진 기관과 장소"></svg>
+  <div class="changed"><span class="kicker">그래서 달라진 것</span><p>학교의 탐구가 마을의 과학이 되었습니다. 여섯 살 아이부터 학부모와 대학생까지, 송례의 탐구에 함께한 사람의 나이에는 담장이 없었습니다.</p></div>
+</article>
+
+<article class="page L" data-id="appendix" data-chap="appendix" data-rub="opt3" data-col="amber" style="--accent:#C9B98A">
+  <div class="run"><b>APPENDIX</b><span>다른 학교와 나누는 자료</span></div>
+  <h2 class="h2">부록,<br>계획서 예시안 모음</h2>
+  <p class="lead" style="font-size:14px">한 해 동안 실제로 쓴 계획서를, 다른 학교가 그대로 가져다 쓸 수 있도록 학교명·교사명·주소·연락처를 지우고 다시 정리했습니다. 목적, 운영 방침, 일정, 예산 예시와 함께 운영하며 얻은 TIP을 프로그램마다 붙였습니다.</p>
+  <button class="plan wide" data-plan="0"><img src="assets/plan00_t.jpg" alt="계획서 예시안 모음 목차"><span><b>00</b>목차 · 프로그램과 평가 영역</span></button>
+  <div class="card" style="margin-top:12px"><p class="meta">이렇게 쓰세요</p><p>위의 목차나 다음 쪽의 프로그램 카드를 누르면 계획서 전체가 크게 열립니다. 열린 화면의 <b>글 복사</b>를 누르면 계획서 내용을 그대로 복사해 한글·Word 문서에 붙여 쓸 수 있습니다.</p></div>
+  <button class="navbtn hot" data-openplan="1" style="margin-top:12px;width:100%;padding:12px">계획서 예시안 열어 보기 →</button>
+</article>
+
+<article class="page R" data-id="appendix2" data-chap="appendix" data-rub="opt3" data-col="amber" style="--accent:#C9B98A">
+  <div class="run"><span>프로그램별 계획서</span><b>11 PLANS</b></div>
+  <p class="note" style="margin-bottom:8px">카드를 누르면 계획서가 크게 열립니다</p>
+  <div class="plans"><button class="plan" data-plan="1"><img src="assets/plan01_t.jpg" alt="과학탐구 성장 마일리지 인증제 계획서 예시안 미리보기"><span><b>01</b>과학탐구 성장 마일리지 인증제</span></button><button class="plan" data-plan="2"><img src="assets/plan02_t.jpg" alt="학교 씨앗은행 계획서 예시안 미리보기"><span><b>02</b>학교 씨앗은행</span></button><button class="plan" data-plan="3"><img src="assets/plan03_t.jpg" alt="1박 2일 해양·천체 과학캠프 계획서 예시안 미리보기"><span><b>03</b>1박 2일 해양·천체 과학캠프</span></button><button class="plan" data-plan="4"><img src="assets/plan04_t.jpg" alt="과학축제 학생 체험부스 참가 계획서 예시안 미리보기"><span><b>04</b>과학축제 학생 체험부스 참가</span></button><button class="plan" data-plan="5"><img src="assets/plan05_t.jpg" alt="지역 초등학생 초청 융합과학교실 계획서 예시안 미리보기"><span><b>05</b>지역 초등학생 초청 융합과학교실</span></button><button class="plan" data-plan="6"><img src="assets/plan06_t.jpg" alt="찾아가는 유아 생태전환 프로그램 계획서 예시안 미리보기"><span><b>06</b>찾아가는 유아 생태전환 프로그램</span></button><button class="plan" data-plan="7"><img src="assets/plan07_t.jpg" alt="씨앗 채종·기탁 프로젝트 계획서 예시안 미리보기"><span><b>07</b>씨앗 채종·기탁 프로젝트</span></button><button class="plan" data-plan="8"><img src="assets/plan08_t.jpg" alt="4일 과학·에코 컨퍼런스 계획서 예시안 미리보기"><span><b>08</b>4일 과학·에코 컨퍼런스</span></button><button class="plan" data-plan="9"><img src="assets/plan09_t.jpg" alt="졸업생 이공계 멘토 초청 계획서 예시안 미리보기"><span><b>09</b>졸업생 이공계 멘토 초청</span></button><button class="plan" data-plan="10"><img src="assets/plan10_t.jpg" alt="이공계 진로 대학 탐방 계획서 예시안 미리보기"><span><b>10</b>이공계 진로 대학 탐방</span></button><button class="plan" data-plan="11"><img src="assets/plan11_t.jpg" alt="월간 과학 소식지 계획서 예시안 미리보기"><span><b>11</b>월간 과학 소식지</span></button></div>
+</article>
+
+<article class="page L" data-id="recap" data-chap="M" data-rub="out" data-col="amber" style="--accent:#FFB547">
+  <div class="run"><b>AFTER A YEAR</b><span>DREAM으로 돌아본 한 해</span></div>
+  <h2 class="h2">한 해 동안<br>달라진 것</h2>
+  <div class="recap">
+    <div style="--sc:#36C9B4"><b>D</b><p>탐구의 과정과 결과가 디지털 기록으로 남았습니다.<span>디지털 기반 탐구환경 활용</span></p></div>
+    <div style="--sc:#4FB8FF"><b>R</b><p>모든 학년이 자기 질문을 세우고 보고서로 답했습니다.<span>탐구 중심 수업 내실화</span></p></div>
+    <div style="--sc:#9AA8FF"><b>E</b><p>과학교사 전원이 30시간 직무연수를 마치고, 탐구 도구를 직접 만들었습니다.<span>교원 전문성 강화</span></p></div>
+    <div style="--sc:#7CE38B"><b>A</b><p>배우던 학생이 이웃에게 탐구를 건네고, 선배가 진로를 열었습니다.<span>지역 연계 교육 강화</span></p></div>
+    <div style="--sc:#FFB547"><b>M</b><p>학교의 탐구를 마을에 열고, 다른 학교와 나눌 자료로 남겼습니다.<span>운영성과 공유·확산</span></p></div>
+  </div>
+</article>
+
+<article class="page R inner" data-id="epi" data-chap="epi" data-col="cyan">
+  <p class="mono" style="color:var(--cyan)">EPILOGUE</p>
+  <h2 style="font-family:var(--f-display);font-weight:400;font-size:clamp(44px,8vh,70px);line-height:1.05"><span class="silver">담장 없는<br>탐구</span></h2>
+  <p class="lead">송례의 탐구는 지금도 담장 밖으로 번지는 중입니다.</p>
+  <form class="gb" id="gb"><label for="gbIn" style="position:absolute;left:-9999px">응원 한마디</label><input id="gbIn" maxlength="40" placeholder="응원 한마디 (이름 없이)"><button type="submit">남기기</button></form>
+  <div class="gb-list" id="gbList"></div>
+  <p class="note">남긴 글은 이 브라우저에만 보입니다 · 학생 개인정보는 싣지 않았습니다</p>
+  <button class="navbtn" data-go="cover">처음으로</button>
+</article>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const el=(t,a={},h='')=>{const e=document.createElement(t);for(const k in a)e.setAttribute(k,a[k]);e.innerHTML=h;return e};
+const DPR=Math.min(2,devicePixelRatio||1);
+const STEPS=[["D", "D", "DREAM · DIGITAL INQUIRY", "디지털 기반 탐구환경 활용", "지능형 과학실과 디지털 기자재를 활용한 데이터 기반 탐구수업 운영", "#36C9B4"], ["R", "R", "DREAM · RESEARCH LEARNING", "탐구 중심 수업 내실화", "탐구 중심 수업 활성화를 통한 학생의 과학적 사고력 및 문제해결 역량 강화", "#4FB8FF"], ["E", "E", "DREAM · EDUCATOR EXPERTISE", "교원 전문성 강화", "교사연구회, 전문 연수 참여를 통해 탐구 중심 역량을 강화 및 탐구 지도 전문성 제고", "#9AA8FF"], ["A", "A", "DREAM · ACTIVE PARTNERSHIP", "지역 연계 교육 강화", "과학 진로체험 및 지역사회 협력 프로그램 운영을 통한 탐구 기회 확대", "#7CE38B"], ["M", "M", "DREAM · MULTIPLYING IMPACT", "운영성과 공유·확산", "탐구수업 우수사례 공유를 통한 과학교육 내실화 및 과학탐구 문화 조성", "#FFB547"]];
+STEPS.forEach(([id,hz,t,n,d,c])=>{$('#arc').append(el('button',{'data-go':id,style:'--sc:'+c},`<span class="hz">${hz}</span><span><span class="t">${t}</span><h3>${n}</h3><p>${d}</p></span>`))});
+[['prologue','설계'],['D','D 디지털'],['R','R 탐구수업'],['E','E 교원'],['A','A 지역'],['M','M 확산'],['appendix','부록']].forEach(([id,t])=>$('#nav').append(el('button',{'data-go':id,'data-nav':id},t)));
+const RUB=[["기획", "prologue", "20", "설계 · DREAM 운영 방향과 네 가지 추진 과제"], ["운영 · 필수", "D", "30", "D 디지털 탐구환경 · R 탐구 중심 수업(1·2·3학년)"], ["운영 · 선택1", "R", "30", "R 학생 주도 탐구 · 동아리 연구, 캠프, 성장여권"], ["운영 · 선택2", "E", "", "E 교원 전문성 · 과학교사 6명 전원 30시간 직무연수 이수, 공동 설계, 직접 만든 도구"], ["운영 · 선택3", "A", "", "A 지역 연계 · M 우수사례 공유와 계획서 예시안 나눔"], ["성과", "c1", "20", "A 이공계 진로 · 졸업생 멘토, 대학 탐방, 진로 특강"]];
+const passIds=['D','R','E','A','M'];
+</script>
+<script>
+/* ============ sky ============ */
+const sky=$('#sky'),sx=sky.getContext('2d');let W,H,stars=[];
+let rc=[79,216,255],tc=[79,216,255];
+function rs(){W=innerWidth;H=innerHeight;sky.width=W*DPR;sky.height=H*DPR;sx.setTransform(DPR,0,0,DPR,0,0);stars=Array.from({length:Math.round(W*H/5200)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.3+.2,t:Math.random()*6,s:Math.random()*.12+.02}))}
+const COL={teal:[54,201,180],sky:[79,184,255],peri:[154,168,255],cyan:[79,216,255],violet:[155,123,255],lime:[124,227,139],amber:[255,181,71]};
+const t0=performance.now();
+function drawSky(t){sx.clearRect(0,0,W,H);for(const s of stars){s.y-=s.s;if(s.y<0)s.y=H;sx.fillStyle=`rgba(210,225,255,${.3+.35*Math.sin(t/900+s.t)})`;sx.beginPath();sx.arc(s.x,s.y,s.r,0,7);sx.fill()}
+  for(let i=0;i<3;i++)rc[i]+=(tc[i]-rc[i])*.04;const [r,g,b]=rc.map(Math.round);const cx=W/2,cy=H*1.05,base=Math.max(W,H);
+  const gr=sx.createRadialGradient(cx,cy,0,cx,cy,base*.55);gr.addColorStop(0,`rgba(${r},${g},${b},.2)`);gr.addColorStop(1,'rgba(0,0,0,0)');sx.fillStyle=gr;sx.fillRect(0,0,W,H);
+  const e=(t-t0)/1000;for(let k=0;k<3;k++){const ph=(e*.1+k/3)%1;sx.strokeStyle=`rgba(${r},${g},${b},${(1-ph)*.22})`;sx.lineWidth=1.3;sx.beginPath();sx.arc(cx,cy,base*(.15+ph*.6),Math.PI,2*Math.PI);sx.stroke()}}
+rs();addEventListener('resize',rs);
+(function loop(t){drawSky(t);if(!RM)requestAnimationFrame(loop)})(t0);
+
+/* ============ BOOK ENGINE ============ */
+const book=$('#book'),slotL=$('#slotL'),slotR=$('#slotR');
+const pages=[...$('#store').children];
+const spreads=[];for(let i=0;i<pages.length;i+=2)spreads.push([pages[i],pages[i+1]]);
+const linear=pages.filter(p=>!p.dataset.skipSingle);
+let single=false,idx=0,busy=false;
+function size(){const sw=innerWidth,sh=innerHeight-56-58-24;single=sw<860;
+  let ph=Math.min(sh,900),pw;
+  if(single){pw=Math.min(560,sw<620?sw-84:sw*.62);ph=Math.min(sh,ph)}else{pw=Math.min((sw-150)/2,ph*.74)}
+  document.documentElement.style.setProperty('--pw',Math.floor(pw)+'px');document.documentElement.style.setProperty('--ph',Math.floor(ph)+'px');
+  book.classList.toggle('single',single)}
+function mount(slot,p){slot.innerHTML='';if(p){slot.append(p);if(p.scrollTop)p.scrollTop=0}}
+const cornerF=el('button',{class:'corner','aria-label':'다음 쪽으로 넘기기'}),cornerB=el('button',{class:'corner back','aria-label':'이전 쪽으로 넘기기'});
+cornerF.onclick=()=>next();cornerB.onclick=()=>prev();
+pages.forEach(pg=>{if(pg.dataset.chap==='appendix'||pg.classList.contains('inner')||pg.classList.contains('cover')||pg.classList.contains('opener'))return;const w=document.createElement('div');w.className='fit';while(pg.firstChild)w.append(pg.firstChild);pg.append(w)});
+function fitPage(pg){const w=pg.querySelector(':scope > .fit');if(!w||!pg.clientHeight)return;w.style.zoom=1;const cs=getComputedStyle(pg);const avail=pg.clientHeight-parseFloat(cs.paddingTop)-parseFloat(cs.paddingBottom);const lim=avail*.96;let z=1;for(let k=0;k<4;k++){const h=w.getBoundingClientRect().height;if(h<=lim+1)break;z=Math.max(.45,z*lim/h);w.style.zoom=z.toFixed(3)}}
+function fitVisible(){setTimeout(()=>{(single?[...track.children].filter(p=>Math.abs(linear.indexOf(p)-idx)<=1):cur()).forEach(p=>p&&fitPage(p))},350);requestAnimationFrame(()=>{(single?[...track.children].filter(p=>Math.abs(linear.indexOf(p)-idx)<=1):cur()).forEach(p=>p&&fitPage(p))})}
+addEventListener('load',fitVisible);document.fonts&&document.fonts.ready.then(fitVisible);document.querySelectorAll('.page img').forEach(im=>im.addEventListener('load',fitVisible));
+const track=el('div',{id:'track'});track.hidden=true;book.append(track);
+const IDX=[["prologue", "들어가며", "표지·설계", "#D9CFC1", ["cover", "prologue"], ""], ["D", "D", "디지털 탐구", "#8FC9BF", ["D"], "Digital"], ["R", "R", "탐구 수업", "#9DBCCB", ["R"], "Research"], ["E", "E", "교원 전문성", "#B3B6DE", ["E"], "Educator"], ["A", "A", "지역 연계", "#A9C2A0", ["A"], "Partnership"], ["M", "M", "성과 확산", "#DDB78F", ["M"], "Impact"], ["appendix", "부록", "계획서 예시", "#C9C2A0", ["appendix"], "다른 학교용"], ["epi", "마무리", "에필로그", "#CF9E9E", ["epi"], ""]];
+const tabsIdx=el('nav',{id:'tabsIdx','aria-label':'단원 색인'});
+IDX.forEach(([id,k,t,c,chs,sub])=>{const b=el('button',{style:'--tc:'+c,'data-chs':chs.join(','),'aria-label':k+' '+t+' 로 이동',title:k+' '+t},`<small>${k}</small><b>${t}</b>${sub?`<span>${sub}</span>`:''}`);b.addEventListener('click',e=>{e.stopPropagation();goId(id==='prologue'?'cover':id)});tabsIdx.append(b)});
+book.append(tabsIdx);
+function layoutTrack(){track.hidden=false;slotL.innerHTML='';slotR.innerHTML='';
+  linear.forEach((p,i)=>{if(p.parentElement!==track)track.append(p);const d=i-idx,a=Math.abs(d);
+    p.classList.toggle('cur',d===0);p.classList.toggle('side-l',d<0);p.classList.toggle('side-r',d>0);
+    p.style.transform=d===0?'translateX(0) rotateY(0) scale(1)':`translateX(${d<0?'-':''}${a===1?84:96}%) rotateY(${d<0?38:-38}deg) scale(${a===1?.86:.78})`;
+    p.style.opacity=a===0?1:a===1?.55:0;p.style.zIndex=10-a;p.style.visibility=a>2?'hidden':'visible';p.setAttribute('aria-hidden',d!==0);p.inert=d!==0;
+    p.onclick=d===0?null:(e)=>{if(Math.abs(i-idx)!==1)return;e.preventDefault();e.stopPropagation();flip(i<idx?-1:1)};
+    if(d===0)p.scrollTop=0})}
+function cur(){return single?[null,linear[idx]]:spreads[idx]}
+function total(){return single?linear.length:spreads.length}
+function render(){if(single){layoutTrack();after();return}track.hidden=true;const [L,R]=cur();mount(slotL,L);mount(slotR,R);
+  (single?slotR:slotR).append(cornerF);if(!single)slotL.append(cornerB);else slotR.append(cornerB);
+  cornerF.hidden=idx>=total()-1;cornerB.hidden=idx<=0;after()}
+function after(){const [L,R]=cur();[L,R].forEach(p=>p&&onShow(p));
+  const n=total();$('#pg').textContent=single?`${idx+1} / ${n}`:(idx===0?'표지':`${String(idx*2-1).padStart(2,'0')}–${String(idx*2).padStart(2,'0')} / ${String((n-1)*2).padStart(2,'0')}`);
+  $('#barI').style.width=(idx/(n-1)*100)+'%';
+  ['#prev','#prevS'].forEach(s=>$(s).disabled=idx<=0);['#next','#nextS'].forEach(s=>$(s).disabled=idx>=n-1);
+  const chap=(R||L).dataset.chap;$$('#tabsIdx button').forEach(b=>{const on=b.dataset.chs.split(',').includes(chap);b.classList.toggle('on',on);if(on)book.style.setProperty('--edge',b.style.getPropertyValue('--tc'))});fitVisible();$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.nav===chap));
+  const ac=(R||L).dataset.col||'cyan';tc=COL[ac];stamp(chap);
+  try{history.replaceState(null,'','#'+((R||L).dataset.id))}catch(_){}}
+function flip(dir){if(busy)return;const n=total();const ni=idx+dir;if(ni<0||ni>=n)return;
+  if(single){idx=ni;busy=true;layoutTrack();after();setTimeout(()=>busy=false,RM?0:650);return}
+  if(RM){idx=ni;render();return}
+  busy=true;const D=900;
+  const leaf=el('div',{class:'leaf '+(dir>0?'fwd':'bwd')});const front=el('div',{class:'face front'}),back=el('div',{class:'face back'});leaf.append(front,back);
+  cornerF.remove();cornerB.remove();
+  if(single){const curP=linear[idx],nxt=linear[ni];
+    if(dir>0){front.append(curP);back.append(el('div',{class:'paperback'}));mount(slotR,nxt);slotR.append(leaf);leaf.style.transformOrigin='left center';leaf.style.left='0';
+      animate(leaf,0,-180,D,()=>{leaf.remove();idx=ni;render()})}
+    else{front.append(nxt);back.append(el('div',{class:'paperback'}));slotR.append(leaf);leaf.style.transformOrigin='left center';leaf.style.left='0';leaf.style.transform='rotateY(-180deg)';
+      animate(leaf,-180,0,D,()=>{leaf.remove();idx=ni;render()})}
+    return}
+  const [L,R]=spreads[idx],[NL,NR]=spreads[ni];
+  fitPage(NL);fitPage(NR);if(dir>0){front.append(R);back.append(NL);mount(slotR,NR);book.append(leaf);animate(leaf,0,-180,D,()=>{leaf.remove();idx=ni;render()})}
+  else{front.append(L);back.append(NR);mount(slotL,NL);book.append(leaf);animate(leaf,0,180,D,()=>{leaf.remove();idx=ni;render()})}}
+function animate(node,a,b,D,done){const s=performance.now();node.classList.add('go');node.style.setProperty('--dur',D+'ms');
+  (function f(t){const p=Math.min(1,(t-s)/D),e=p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;const ang=a+(b-a)*e;const lift=Math.sin(p*Math.PI)*18;
+    node.style.transform=`rotateY(${ang}deg) translateZ(${lift}px)`;
+    if(p<1)requestAnimationFrame(f);else{busy=false;done()}})(s)}
+function next(){flip(1)}function prev(){flip(-1)}
+function goId(id){const p=pages.find(x=>x.dataset.id===id)||pages.find(x=>x.dataset.chap===id);if(!p)return;
+  if(single){idx=Math.max(0,linear.indexOf(p))}else{idx=Math.floor(pages.indexOf(p)/2)}render();return p}
+$$('[data-go]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();goId(b.dataset.go)}));
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b&&!b.__bound){}});
+$('#next').onclick=$('#nextS').onclick=next;$('#prev').onclick=$('#prevS').onclick=prev;
+addEventListener('keydown',e=>{if(/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName))return;
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();next()}
+  if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();prev()}
+  if(e.key==='Home'){goId('cover')}if(e.key==='f'||e.key==='F')fs();if(e.key==='Escape')toggleDrawer(false)});
+let sx0=null,sy0=null;book.addEventListener('pointerdown',e=>{if(e.target.closest('input,select,button,canvas,video,a,svg .node'))return;sx0=e.clientX;sy0=e.clientY});
+book.addEventListener('pointerup',e=>{if(sx0==null)return;const dx=e.clientX-sx0,dy=e.clientY-sy0;sx0=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.4){dx<0?next():prev()}});
+function fs(){try{if(!document.fullscreenElement)document.documentElement.requestFullscreen().catch(()=>{});else document.exitFullscreen()}catch(_){}}
+$('#fsBtn').onclick=fs;
+addEventListener('resize',()=>{const was=single;const p=cur()[1]||cur()[0];size();if(was!==single){if(single){idx=Math.max(0,linear.indexOf(p))}else{idx=Math.floor(pages.indexOf(p)/2)}}render()});
+
+
+/* per-page activation */
+function onShow(p){const c=document.getElementById('coverVid');if(!c)return;if(p.dataset.id==='cover'){try{const r=c.play();r&&r.catch&&r.catch(()=>{})}catch(_){}}}
+const passport=$('#passport');[['D','#36C9B4'],['R','#4FB8FF'],['E','#9AA8FF'],['A','#7CE38B'],['M','#FFB547']].forEach(([h,c])=>passport.append(el('i',{style:'--sc:'+c},h)));const stamped=new Set();
+function stamp(ch){const i=passIds.indexOf(ch);if(i<0||stamped.has(i))return;stamped.add(i);passport.children[i+1].classList.add('on')}
+
+/* ripple map (no numbers) */
+{const R=[0,95,165,225,280],rcs=['','#7CE38B','#7CE38B','#B8E68B','#FFB547'];let sh='';
+const nodes=[[1,-70,'위례새솔어린이집'],[1,15,'송례초 · 위례별초'],[1,105,'학부모 · 이웃'],[1,195,'위례 하천 · 대모산'],[2,-30,'강동송파영재교육원'],[2,60,'서울여자대학교'],[2,150,'서울대학교'],[3,-125,'국립중앙과학관'],[3,20,'강릉 해양과학교육원'],[3,110,'백두대간 시드볼트'],[4,-40,'UN SDGs']];
+for(let i=4;i>=1;i--)sh+=`<circle cx="300" cy="300" r="${R[i]}" fill="none" stroke="${rcs[i]}" stroke-opacity="${.2+.1*(4-i)}" stroke-dasharray="${i===4?'3 6':'none'}"><animate attributeName="r" values="${R[i]-4};${R[i]+4};${R[i]-4}" dur="${5+i}s" repeatCount="indefinite"/></circle>`;
+['','마을','서울','전국','세계'].forEach((t,i)=>{if(i)sh+=`<text x="300" y="${300-R[i]+17}" text-anchor="middle" style="font-size:13px;fill:#8FA3C4;font-family:IBM Plex Mono">${t}</text>`});
+sh+=`<circle cx="300" cy="300" r="42" fill="rgba(124,227,139,.15)" stroke="#7CE38B" stroke-width="2"/><text x="300" y="306" text-anchor="middle" style="font-size:18px;font-weight:700;fill:#fff">송례</text>`;
+nodes.forEach(([r,a])=>{const t=a*Math.PI/180,x=300+R[r]*Math.cos(t),y=300+R[r]*Math.sin(t);sh+=`<line x1="300" y1="300" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${rcs[r]}" stroke-opacity=".25"/>`});
+nodes.forEach(([r,a,n],i)=>{const t=a*Math.PI/180,x=300+R[r]*Math.cos(t),y=300+R[r]*Math.sin(t);const an=Math.cos(t)>.3?'start':Math.cos(t)<-.3?'end':'middle';const tx=x+(an==='start'?14:an==='end'?-14:0),ty=y+(an==='middle'?(Math.sin(t)>0?26:-16):5);
+  sh+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="16" fill="${rcs[r]}" fill-opacity=".14"><animate attributeName="r" values="11;19;11" dur="3s" begin="${i*.25}s" repeatCount="indefinite"/></circle><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="${rcs[r]}" stroke="#fff" stroke-width="1.5"/><text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" text-anchor="${an}">${n}</text>`});
+$('#rmap').innerHTML=sh}
+
+/* rubric drawer */
+const drawer=$('#drawer');
+RUB.forEach(([n,id,pt,d])=>{const b=el('button',{},`<b>${n}</b><span class="pt">${pt||'·'}</span><span>${d}</span>`);b.onclick=()=>{goId(id);const ps=single?[cur()[1]]:cur();ps.forEach(x=>x&&x.classList.add('hl'));setTimeout(()=>ps.forEach(x=>x&&x.classList.remove('hl')),3000);if(innerWidth<700)toggleDrawer(false)};$('#rub').append(b)});
+function toggleDrawer(o){drawer.classList.toggle('open',o);$('#rubBtn').setAttribute('aria-expanded',o)}
+$('#rubBtn').onclick=()=>toggleDrawer(!drawer.classList.contains('open'));$('#drawerClose').onclick=()=>toggleDrawer(false);
+
+/* guestbook */
+let gb=[];try{gb=JSON.parse(localStorage.getItem('songrye-gb')||'[]')}catch(_){}
+const seedGB=['담장 밖까지 번진 탐구, 멋져요','선배처럼 되고 싶어요','씨앗 잘 키울게요'];
+function renderGB(){const all=[...gb,...seedGB].slice(-10);$('#gbList').innerHTML='';all.forEach(t=>{const s=document.createElement('span');s.textContent=t;$('#gbList').append(s)})}
+$('#gb').addEventListener('submit',e=>{e.preventDefault();const v=$('#gbIn').value.trim();if(!v)return;gb.push(v);try{localStorage.setItem('songrye-gb',JSON.stringify(gb.slice(-30)))}catch(_){}$('#gbIn').value='';renderGB()});renderGB();
+
+
+const PLAN_TXT=["과학탐구 선도학교 프로그램 계획서 예시안\n\n이 자료는 한 중학교가 과학탐구 선도학교를 1년간 운영하며 실제로 사용한 계획서를, 다른 학교가 참고할 수 있도록 학교 정보를 지우고 다시 정리한 예시안입니다. 학교명, 교사명, 주소, 연락처, 신청 링크는 모두 ○○으로 바꾸었습니다. 금액과 인원은 실제 운영 규모를 바탕으로 한 예시이므로 학교 여건에 맞게 조정해 사용하세요.\n\n  순   프로그램                          운영 단계     관련 평가 영역\n  ---- --------------------------------- ------------- ---------------------\n  1    과학탐구 성장 마일리지 인증제     학교          운영(선택1)\n  2    학교 씨앗은행                     학교          운영(선택1)\n  3    1박 2일 해양·천체 과학캠프        학교          운영(선택1)\n  4    과학축제 학생 체험부스 참가       학교 → 지역   운영(선택1·3)\n  5    지역 초등학생 초청 융합과학교실   지역          운영(선택3)\n  6    찾아가는 유아 생태전환 프로그램   지역          운영(선택3)\n  7    씨앗 채종·기탁 프로젝트           지역 → 국가   운영(선택1·3)\n  8    4일 과학·에코 컨퍼런스            지역          운영(선택1·3), 성과\n  9    졸업생 이공계 멘토 초청           진로          성과\n  10   이공계 진로 대학 탐방             진로          성과\n  11   월간 과학 소식지                  학교          운영(선택1)", "1. 과학탐구 성장 마일리지 인증제 운영 계획(예시)\n\nⅠ. 추진 목적\n\n1.  과학탐구 선도학교 운영의 일환으로 학생들의 과학 관련 활동 참여를 활성화하고 과학적 탐구 역량을 기른다.\n2.  다양한 과학 행사와 탐구활동 참여 과정을 누적·인증하여 자기 주도적 성장을 지원한다.\n3.  성장단계 인증으로 지속적인 참여 동기를 부여하고 학교 과학 문화를 만든다.\n\nⅡ. 운영 방침\n\n1.  선도학교 운영 프로그램과 연계한 학생 중심 성장단계 인증제로 운영한다.\n2.  학생별 「과학탐구 성장여권」으로 참여 이력을 누적 관리하며, 여권 발급 이전에 실시한 과학 활동도 소급 인정한다.\n3.  누적 실적에 따라 단계별로 인증하고, 인증 스티커와 성장 배지 등 눈에 보이는 보상으로 동기를 높인다.\n\nⅢ. 세부 추진 계획\n\n1.  운영 기간: 20○○. 7. ~ 20○○. 12.\n2.  운영 대상: 전교생\n3.  인증 대상 활동\n    -   교내 과학·생태전환 관련 행사 참여\n    -   교내·교외(교육청 및 산하기관 주관) 과학 대회 참가(성실한 참여 기준)\n    -   정규 교육과정 과학 수업에서 탐구보고서 작성\n4.  성장단계 인증 절차\n\n  ------------------------------------------------------------------------------------------------------------\n  단계                                내용\n  ----------------------------------- ------------------------------------------------------------------------\n  1단계 활동 참여                     과학 프로그램 참여 후 담당 교사에게 확인 요청\n\n  2단계 스티커 부여                   성장여권에 인증 스티커 부착(여권은 레벨 3부터 증정)\n\n  3단계 단계 인증                     누적 실적 달성 시 인증 배지와 레벨 스티커 지급(인증 1회당 레벨 1 성장)\n  ------------------------------------------------------------------------------------------------------------\n\nⅣ. 소요 예산(예시)\n\n  품목                   산출 근거           금액\n  ---------------------- ------------------- -----------\n  성장여권 수첩          1,500원 × 300개     450,000원\n  마일리지 단계 스티커   20,000원 × 10단계   200,000원\n  여권 표지 스티커       500원 × 300개       150,000원\n  계                                         800,000원\n\nⅤ. 기대 효과\n\n1.  학생 참여 중심의 과학 문화 조성\n2.  과학 행사와 탐구활동 참여 확대\n3.  학생 성장 과정의 체계적 기록과 관리\n\n  운영 TIP 수업 탐구보고서도 인증 대상에 넣으면, 행사에 참여하지 못하는 학생도 정규 수업만으로 여권을 채울 수 있습니다.", "2. 학교 씨앗은행 운영 계획(예시)\n\nⅠ. 추진 목적\n\n1.  탄소중립을 위해 가정에서 지구를 위한 작은 실천에 함께한다.\n2.  반려식물을 정성껏 키우며 정서적 안정과 스트레스 해소를 돕는다.\n3.  식물의 성장과 씨앗 형성 과정을 관찰하며 생명 탐구심을 기른다.\n\nⅡ. 운영 방침\n\n1.  4월 과학의 달과 식목일에 맞추어 학교 씨앗은행을 개설한다.\n2.  씨앗 대출 서약서를 작성한 학생에게 모종과 흙을 제공한다.\n3.  9~11월에 거둔 씨앗을 씨앗은행에 반납하고, 반납받은 씨앗은 보관 후 다시 대출한다.\n4.  재배 경험이 적은 학생도 쉽게 참여하도록 발아 단계가 지난 허브 모종을 제공한다.\n5.  과학실에서도 직접 씨앗을 발아시켜 재배하며 식물 탐구에 활용한다.\n\nⅢ. 행사 개요\n\n-   일정: 20○○. 4월 중 2일간(기상 상황에 따라 변동 가능)\n-   장소: 교내 출입문 등 학생 동선이 많은 곳\n-   준비물: 식물을 키울 재활용 용기(학생 지참)\n-   수령품: 1인당 모종 1개, 흙, 배수망\n-   대상: 재학생 중 선착순 200명(재료 소진 시 조기 종료)\n\nⅣ. 구입 물품(예시)\n\n  품목                      금액\n  ------------------------- -----------\n  허브 모종(200명분)        450,000원\n  과학실 실내 텃밭용 모종   50,000원\n  흙(상토·마사토 250리터)   100,000원\n  배수망                    30,000원\n  참여 학생 기념품          50,000원\n  계                        680,000원\n\nⅤ. 기타\n\n1.  수확한 씨앗 반납, 다른 종자 대신 제출, 새싹 요리 인증 사진 제출 학생에게 11월 중 소정의 상품을 준다.\n2.  성실히 참여한 학생은 활동 내용을 학교생활기록부(창의적 체험활동 - 자율활동)에 기재한다.\n3.  붙임: 씨앗 대출 대장(순, 학번, 성명, 대출일, 대출 씨앗 종류, 반납일, 반납 씨앗 종류)\n\n  운영 TIP ‘빌리고 갚는’ 은행 형식을 유지하되 씨앗 대신 모종으로 시작하면 실패율이 크게 줄고, 가을 반납까지 이어지는 학생이 늘어납니다.", "3. 1박 2일 해양·천체 과학캠프 운영 계획(예시)\n\nⅠ. 추진 목적\n\n1.  학교에서 접하기 어려운 살아 있는 해양생물을 활용한 실험·실습 기회를 제공한다.\n2.  과학 문화를 확산하고 학생들이 별과 우주를 향한 꿈을 키우도록 한다.\n3.  실생활과 미래사회의 현상을 과학적으로 사고하고 탐구하며 과학 기초 소양을 높인다.\n\nⅡ. 주요 내용\n\n-   장소: ○○대학교 부설 해양과학교육원(숙박·교육 시설 보유 기관)\n-   일시: 20○○. 6월 중 금~토, 1박 2일(금요일 수업 후 출발)\n-   대상: 2, 3학년 희망 학생 36명, 지도교사 6명\n-   선발: 수업 태도와 학교생활이 성실한 학생 중 자기소개서와 학부모 동의서를 제출한 학생\n\nⅢ. 일정(예시)\n\n  일차    시간          A팀(18명)                      B팀(18명)\n  ------- ------------- ------------------------------ ------------------------------\n  1일차   15:30~18:30   수업 후 출발                   \n          18:30~19:30   석식                           \n          19:30~21:00   창의력 문제해결 메이커 교육    \n          21:00~22:30   천체관측                       \n  2일차   08:00~09:00   조식 및 객실 정리              \n          09:00~09:50   어류 생태교육 및 관찰          \n          10:00~10:50   무척추동물 탐구                동·식물 플랑크톤 현미경 관찰\n          11:00~11:50   동·식물 플랑크톤 현미경 관찰   무척추동물 탐구\n          13:00~16:00   인근 해변 해양 탐구활동        \n          16:00~        학교로 출발                    \n\nⅣ. 소요 예산(예시)\n\n1.  학교 예산: 교육비, 숙박비, 단체 티셔츠, 간식비, 탐구활동 재료비(36명 기준 약 310만 원), 지도교사 여비·보험료(약 66만 원)\n2.  수익자 부담: 왕복 버스, 여행자보험료, 식사비(1인 약 8만 원). 학교운영위원회 심의 후 CMS 자동 인출로 징수하며, 출발 2~3일 전까지 취소 시 환불한다.\n\nⅤ. 사전 준비와 기타\n\n1.  사전교육: 안전교육, 학교폭력 예방교육, 성교육\n2.  출발 한 달 전 교육원, 식사 업체, 야외 활동 장소를 사전 답사한다.\n3.  적극적으로 활동하고 탐구보고서를 제출한 학생은 학교생활기록부에 기재한다.\n4.  선발 후 단순 변심으로 불참하면 이후 과학 행사 선발 시 불이익이 있을 수 있음을 미리 안내한다.\n\n  운영 TIP 두 팀이 오전 활동을 교차로 돌면 한 실습실에 인원이 몰리지 않아 현미경 관찰 시간을 충분히 확보할 수 있습니다.", "4. 과학축제 학생 체험부스 참가 신청(예시)\n\n국립과학관 등이 주최하는 과학축제에 동아리 체험부스로 참가할 때 제출하는 신청서 예시입니다.\n\n  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n  항목                    예시 1                                                                                                                                                                  예시 2\n  ----------------------- ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- -----------------------------------------------------------------------------------------------------------------------------------\n  동아리                  기후환경 동아리                                                                                                                                                         생명과학 동아리\n\n  분야                    기후·환경                                                                                                                                                               생명과학\n\n  부스 제목               「도시의 온도를 낮춰라!」 테라리움으로 만드는 쿨 빌리지                                                                                                                 「3글자의 비밀, 생명의 암호를 해독하라!」\n\n  체험 내용               체험자가 테라리움 도시 모형을 꾸미고 적외선 온도계로 표면 온도를 잰 뒤, 녹지가 없는 모형과 비교한다. 녹지 비율, 지표면, 토양 수분을 바꿔 가장 시원한 도시를 설계한다.   DNA의 정보가 RNA를 거쳐 단백질이 되는 과정을 교구로 체험한다. 코돈표를 이용한 ’오류 찾기 게임’과 ’단백질 만들기 미션’을 수행한다.\n\n  기대 효과               도시 열섬 현상을 데이터로 이해하고 기후 위기 대응 감수성을 기른다.                                                                                                      생명 현상을 직접 배열하며 이해하고, 시약 없이 누구나 참여하는 안전한 체험을 제공한다.\n  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n\n  운영 TIP 동아리에서 한 학기 동안 탐구한 주제를 그대로 부스로 옮기면, 학생이 시민에게 설명하며 자기 탐구를 한 번 더 정리하는 기회가 됩니다.", "5. 지역 초등학생 초청 융합과학교실 운영 계획(예시)\n\nⅠ. 추진 목적\n\n1.  선도학교로서 인근 초등학생에게 과학 체험 기회를 제공하고 지역 과학 문화 확산에 기여한다.\n2.  STEAM 기반 체험·탐구 활동으로 창의적 문제해결력과 융합적 사고력을 기른다.\n\nⅡ. 운영 방침\n\n1.  인근 초등학교 6학년을 초청해 중학생과 한 모둠으로 운영한다.\n2.  과학실 안전교육을 포함해 안전사고 예방과 질서 지도를 철저히 한다.\n3.  같은 해 다른 과학 행사(캠프 등)에 참여한 학생은 선발 시 후순위로 하여 참여 기회를 넓힌다.\n4.  본교 과학교사를 강사로 위촉하고 강사료는 방과후학교 운영 지침에 따라 지급한다.\n\nⅢ. 운영 개요\n\n-   일시: 20○○. 7월 중 토요일 13:00~18:30\n-   대상: 본교 학생 40명 + 인근 초등학교 6학년 16명(정원 초과 시 전산 추첨, 미달 시 본교 학생으로 충원)\n-   장소: 본교 과학실 3곳\n-   운영: 2개 반(중학생 20 + 초등학생 8), 3개 프로그램을 90분씩 순환\n\n  -----------------------------------------------------------------------------------------------------------\n  시간                    A반                                       B반\n  ----------------------- ----------------------------------------- -----------------------------------------\n  13:30~15:00             스마트 모빌리티: 나만의 자율주행 자동차   실생활 속 생체모방기술\n\n  15:15~16:45             과학수사대: 과학으로 사건 해결            스마트 모빌리티: 나만의 자율주행 자동차\n\n  17:00~18:30             실생활 속 생체모방기술                    과학수사대: 과학으로 사건 해결\n  -----------------------------------------------------------------------------------------------------------\n\nⅣ. 추진 일정\n\n운영계획 수립 및 가정통신문 발송 → 초등학교에 참가 안내 협조 공문 발송 → 신청 접수(URL·QR, 약 1주) → 추첨 및 결과 안내(초등학교 알림 활용) → 재료 구입 및 운영 → 사후 만족도 조사\n\nⅤ. 소요 예산(예시, 56명 기준)\n\n  항목            산출 근거              금액\n  --------------- ---------------------- -------------\n  실험실습 재료   28,000원 × 56명        1,568,000원\n  강사료          40,000원 × 2회 × 6명   480,000원\n  운영 물품       10,000원 × 56명        560,000원\n  간식비          5,000원 × 56명         280,000원\n  계                                     2,608,000원\n\n  운영 TIP 신청 시 수집한 초등학생·학부모 개인정보는 행사 종료와 함께 삭제한다고 신청서에 명시하고, 대기자를 20% 정도 미리 뽑아 두면 결원을 바로 채울 수 있습니다.", "6. 찾아가는 유아 생태전환 프로그램(예시)\n\nⅠ. 주제\n\n「미래에게 건네는, 작은 손의 씨앗 한 알」\n\nⅡ. 운영 목적\n\n1.  어린이들의 환경 감수성과 생태 실천 의식을 기른다.\n2.  지역사회 연계 나눔 활동으로 중학생의 공동체 역량과 지속가능성 실천 능력을 기른다.\n\nⅢ. 운영 개요\n\n-   일시: 20○○. 5월 중 평일 오후 2시간\n-   장소: 협력 어린이집 인근 근린공원\n-   대상: 협력 어린이집 6~7세 원아(약 120명)\n-   운영: 학교 생태전환 동아리 학생 3개 모둠과 지도교사\n\n  ----------------------------------------------------------------------------------------------------\n  순                프로그램                               활동                      운영\n  ----------------- -------------------------------------- ------------------------- -----------------\n  1                 깨끗한 지구를 만들어요!                뚝딱뚝딱! 분리배출 놀이   동아리 1모둠\n\n  2                 미래에게 건네는 작은 손의 씨앗 한 알   작은 씨앗, 큰 약속        동아리 2모둠\n\n  3                 씨앗을 행복하게 기르는 법              쑥쑥 씨앗 키우기          동아리 3모둠\n  ----------------------------------------------------------------------------------------------------\n\n  운영 TIP 모둠마다 한 가지 활동만 맡겨 원아들이 순환하게 하면, 중학생이 같은 수업을 여러 번 하며 설명이 점점 나아지는 것을 스스로 느낍니다. 사진 촬영 시 원아 얼굴이 나오지 않도록 미리 협의하세요.", "7. 씨앗 채종·기탁 프로젝트 운영 계획(예시)\n\nⅠ. 추진 목적\n\n1.  기후위기와 식량 위기의 심각성을 스스로 인식하고 지속가능한 미래의 주체로 성장한다.\n2.  교내 정원과 지역 생태 자원을 활용해 생물 다양성과 씨앗 보존의 중요성을 경험한다.\n3.  채종-기록-보관-기탁 과정을 실습하며 공동체적 책임과 환경 보전의 가치를 배운다.\n\nⅡ. 운영 방침\n\n1.  학생 주도의 프로젝트형으로 운영하고, 과학 교과와 생태 동아리 활동을 융합한다.\n2.  학교 주변 공원과 산 등 지역 생태와 연계해 생활 속 기후위기 문제를 탐구한다.\n3.  결과물은 교내 전시와 국가 종자 보존 시설(예: 백두대간 글로벌 시드볼트) 기탁으로 확산한다.\n\nⅢ. 운영 개요\n\n-   대상: 1, 2학년 희망 학생 20명 및 생태 동아리\n-   기간: 10~11월, 금요일 방과 후 3회 + 동아리 상시 운영\n-   장소: 교내 정원, 학교 인근 공원, 과학실, 인근 산\n\n  -----------------------------------------------------------------------------------------------------------------------\n  구분                                 주요 활동                                                  대상\n  ------------------------------------ ---------------------------------------------------------- -----------------------\n  Part 1. 지구의 기억, 생명의 씨앗     교직원 생태전환 연수(식물 구조·표본 관찰, 자생식물 해설)   희망 교직원\n\n  Part 2. 내 손으로 지키는 작은 씨앗   식물 구조·표본 관찰, 학교 및 인근 자생식물 해설            희망 학생 20명\n\n  Part 3. 씨앗 채종과 보존             인근 산 자생식물 씨앗 채종                                 희망 학생 20명\n\n  Part 4. 우리 학교의 씨앗, 세계로     분류·건조, 종자 정선, 일지 작성, 포장 및 기탁              생태 동아리\n  -----------------------------------------------------------------------------------------------------------------------\n\nⅣ. 소요 예산(예시)\n\n  품목                     산출 근거                           금액\n  ------------------------ ----------------------------------- -----------\n  채종 및 동정 관련 물품                                       100,000원\n  간식비                   5,000원 × 20명 × 2회                200,000원\n  외부 강사비              160,000원 × 2회 + 원고료 40,000원   360,000원\n  계                                                           660,000원\n\n  운영 TIP 교직원 연수를 학생 활동보다 먼저 두면, 담임과 다른 교과 선생님도 학생들의 채종 활동을 이해하고 함께 지원할 수 있습니다.", "8. 4일 과학·에코 컨퍼런스 운영 계획(예시)\n\nⅠ. 추진 개요\n\n-   기간: 20○○. 10월 중 수~토 4일간 / 교내 및 프로그램별 연계 공간\n-   대상: 전교생과 학부모, 지역 영재교육원 학생과 학부모, 인근 초등학생과 학부모\n-   목적: 교과 수업, 과학탐구, 영재교육, 환경동아리, 진로교육을 하나의 흐름으로 연결해 학생이 참여자를 넘어 탐구자·발표자·토론자·도슨트로 성장하는 경험을 제공한다.\n\nⅡ. 운영 방침\n\n1.  단순 체험 행사를 넘어 ’탐구-진로-연구-공유’가 이어지는 이공계 진로 프로그램으로 운영한다.\n2.  각 프로그램을 관련 학문 분야, 대학 전공, 직업 세계와 연결한다.\n3.  학생이 질문자, 조사자, 발표자, 토론자, 도슨트 등 능동적 역할을 맡는다.\n4.  대학, 전문가, 과학 커뮤니케이터 등 외부 인적 자원으로 진로 세계와의 접점을 넓힌다.\n\nⅢ. 4단계 구성\n\n  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n  일차              단계              내용                                                                                                대상\n  ----------------- ----------------- --------------------------------------------------------------------------------------------------- -------------------------------------------------\n  1일               만나다            학교 오케스트라 공연, 과학 크리에이터 이공계 진로 토크콘서트                                        재학생, 인근 초등학생\n\n  2일               기록하다          하늘·구름 사진 공모전, 인근 하천 생물다양성·수질·토질 데이터 전시, 자원순환교육과 녹색일자리 탐색   재학생\n\n  3일               실천하다          대학 환경동아리와 함께하는 UN SDGs 청소년 환경 포럼                                                 재학생\n\n  4일               공유하다          학생·영재교육원 연구 포스터 발표, 창의융합 과학 체험부스                                            재학생·학부모, 영재교육원, 인근 초등학생·학부모\n  -----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n\nⅣ. 심포지엄 구성(4일차 예시)\n\n1.  영재교육원 산출물 발표(물리·화학·지구과학·생명과학 영역 약 12주제)\n2.  학생 과학탐구 포스터 발표(에너지, 생활 화학, 생명 영역 약 9주제)\n3.  지구과학 기후·대기 집중 탐구(하늘은 왜 파란색일까?, 미세먼지는 얼마나 작을까? 등 9주제)\n4.  체험부스: 흑점 관찰, 현미경, DNA 비즈, 사이언스 키링, 에어로켓, AI 프롬프트, 코딩, AI 포토 스튜디오 등\n\nⅤ. 신청과 운영\n\n-   가정통신문 링크 또는 QR로 온라인 신청(학생은 4일 전체, 학부모는 4일차만)\n-   정원이 있는 강연·교육은 선착순 접수 후 초과 시 별도 선정\n-   신청 정보는 행사 운영 목적으로만 쓰고 종료 후 즉시 파기한다고 안내\n-   사전 협의회와 사후 평가 협의회 운영\n\n  운영 TIP 나흘에 ’만나다-기록하다-실천하다-공유하다’처럼 동사형 이름을 붙이면, 흩어진 행사가 하나의 이야기로 읽혀 학생과 학부모 모두 흐름을 쉽게 이해합니다.", "9. 졸업생 이공계 멘토 초청 진학 멘토링 운영 계획(예시)\n\nⅠ. 추진 개요\n\n-   일시: 20○○. 7월 중 평일 16:00~17:00\n-   대상: 60명(지역 영재교육원 교육대상자 30명 + 이공계 진학 희망 재학생 30명)\n-   주제: 감사로 이어진 우리 학교 공동체\n-   목적: 본교를 졸업하고 이공계 학교에 진학한 선배의 경험담으로 구체적인 학업 로드맵을 제시하고 동기를 부여한다.\n\nⅡ. 운영 방침\n\n1.  가정통신문으로 사전 신청을 받고, 일방적 강의가 아닌 재학생의 실제 진학 고민을 해결하는 질의응답 중심으로 운영한다.\n2.  영재교육원 학생과 함께 운영해 학교 간 학습 교류와 공동체 의식을 기른다.\n3.  종료 후 만족도 조사와 질의응답 결과를 분석해 다음 진로 프로그램 개선에 활용한다.\n\nⅢ. 세부 운영\n\n  ------------------------------------------------------------------------------------------------\n  시간                    내용                      운영\n  ----------------------- ------------------------- ----------------------------------------------\n  16:00~16:20             장소 준비 및 사전 협의    과학·연구·진로 담당 부서\n\n  16:20~17:00             졸업생 특강 및 질의응답   멘토: 본교 졸업 → 과학고 → 과학기술원 재학생\n  ------------------------------------------------------------------------------------------------\n\n  운영 TIP 멘토에게 ’재학 시절 학교의 어떤 실험·동아리 경험이 진학에 도움이 되었는지’를 미리 부탁하면, 후배들이 지금의 선도학교 프로그램을 진로와 연결해 바라보게 됩니다.", "10. 이공계 진로 대학 탐방 운영 계획(예시)\n\nⅠ. 추진 목적\n\n1.  대학 탐방으로 이공계 진로 탐색과 진로 설계 역량을 기른다.\n2.  이공계 대학생 멘토링과 연계해 자기주도적 학습 역량을 기른다.\n\nⅡ. 주요 내용\n\n-   장소: ○○대학교\n-   일시: 20○○. 8월 중 토요일 09:00~17:00\n-   대상: 2, 3학년 40명, 지도교사 2명\n-   선발: 수업 태도와 학교생활이 성실한 학생 중 신청서 제출자\n\n  ---------------------------------------------------------------------------------------------\n  시간                                내용\n  ----------------------------------- ---------------------------------------------------------\n  09:00~10:00                         집결, 출석 확인 및 대학 이동\n\n  10:00~10:30                         대학생 멘토와의 만남 및 오리엔테이션\n\n  10:30~12:00                         대학생 멘토와 함께하는 조별 캠퍼스 투어\n\n  12:00~13:30                         멘토와 점심 식사 및 휴식\n\n  13:30~15:00                         이공계 학습·진로 멘토링(전공 소개, 학습법, 시간 관리법)\n\n  15:00~16:00                         진로 탐색 활동지 작성 및 피드백\n\n  16:00~17:00                         학교 복귀 및 귀가\n  ---------------------------------------------------------------------------------------------\n\nⅢ. 예산(예시)\n\n-   수익자 부담: 왕복 버스, 위탁 프로그램 운영비(캠퍼스 투어·멘토링), 여행자보험(1인 약 8~9만 원, 중식 별도)\n-   학교 예산: 지도교사 교통비·보험료\n-   참가 인원이 20명 이하이면 버스 대신 대중교통으로 이동한다.\n\nⅣ. 사전교육과 기타\n\n1.  안전교육, 학교폭력 예방교육, 성교육\n2.  성실히 참여한 학생은 학교생활기록부(창의적 체험활동 - 자율활동)에 기재한다.\n\n  운영 TIP 오후 멘토링 직후 진로 탐색 활동지를 바로 쓰게 하면, 들은 내용이 자기 진로 계획으로 정리되어 생활기록부 기재 근거도 함께 남습니다.", "11. 월간 과학 소식지 운영 계획(예시)\n\nⅠ. 추진 목적\n\n1.  교내 과학 행사와 탐구활동 소식을 공유해 학생들의 과학적 관심을 높인다.\n2.  매월 정기 소식지로 일상 속에서 과학 문화를 접하는 환경을 만든다.\n3.  과학자 이야기와 생활 과학 정보를 학생 스스로 읽고 익히는 기회를 준다.\n\nⅡ. 운영 방침\n\n1.  첨단 과학실, 학년별 탐구 성공 사례 등 교내 과학 활동을 시각 자료로 공유한다.\n2.  매월 같은 코너 틀을 써서 제작 부담을 줄이고 정기 발행을 지킨다.\n3.  인쇄물 배포와 게시판 부착, 온라인 게시를 함께 활용한다.\n\nⅢ. 운영 개요\n\n-   기간: 20○○. 7. ~ 12.(매월 초 1회, 연 5~6회)\n-   대상: 전교생 및 교직원\n\n  코너                  내용 예시\n  --------------------- ---------------------------------------\n  우리 학교 과학 뉴스   새 과학실 오픈, 학년별 탐구 성공 사례\n  이달의 과학 행사      진행 중인 행사 성과, 다음 행사 안내\n  이달의 과학자         켈빈 경과 절대온도의 정립 과정\n  이달의 밤하늘         여름철 대삼각형과 초승달 관측 시기\n  이달의 과학 명언      과학자의 명언으로 호기심 자극\n\n  운영 TIP ’이달의 밤하늘’처럼 학생이 그날 밤 직접 확인할 수 있는 코너를 하나 두면, 읽고 끝나는 소식지가 아니라 해 보는 소식지가 됩니다."];
+const PLAN_NAMES=['목차','과학탐구 성장 마일리지 인증제','학교 씨앗은행','1박 2일 해양·천체 과학캠프','과학축제 학생 체험부스 참가','지역 초등학생 초청 융합과학교실','찾아가는 유아 생태전환 프로그램','씨앗 채종·기탁 프로젝트','4일 과학·에코 컨퍼런스','졸업생 이공계 멘토 초청','이공계 진로 대학 탐방','월간 과학 소식지'];
+let vi=0;function openPlan(i){vi=(i+PLAN_NAMES.length)%PLAN_NAMES.length;$('#vImg').src=`assets/plan${String(vi).padStart(2,'0')}.jpg`;$('#vImg').alt=PLAN_NAMES[vi]+' 계획서 예시안';$('#vTitle').textContent=(vi?String(vi).padStart(2,'0')+'. ':'')+PLAN_NAMES[vi]+' · 계획서 예시안';$('#viewer').hidden=false;$('#vScroll').scrollTop=0;$('#vClose').focus()}
+function closePlan(){$('#viewer').hidden=true}
+$$('.plan').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openPlan(+b.dataset.plan)}));$$('[data-openplan]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();openPlan(+b.dataset.openplan)}));
+$('#vClose').onclick=closePlan;$('#vCopy').onclick=async()=>{const b=$('#vCopy');try{await navigator.clipboard.writeText(PLAN_TXT[vi]);b.textContent='복사됨 ✓'}catch(_){b.textContent='복사 안 됨: 이미지를 참고해 주세요'}setTimeout(()=>b.textContent='글 복사',2200)};$('#vPrev').onclick=()=>openPlan(vi-1);$('#vNext').onclick=()=>openPlan(vi+1);
+$('#viewer').addEventListener('click',e=>{if(e.target.id==='viewer'||e.target.id==='vScroll')closePlan()});
+addEventListener('keydown',e=>{if($('#viewer').hidden)return;e.stopImmediatePropagation();if(e.key==='Escape')closePlan();if(e.key==='ArrowRight')openPlan(vi+1);if(e.key==='ArrowLeft')openPlan(vi-1)},true);
+
+/* ===== cover trailer ===== */
+setInterval(()=>{const c=document.getElementById('coverVid');if(!c)return;const vis=(single?[linear[idx]]:cur()).some(x=>x&&x.dataset.id==='cover');if(!vis&&!c.paused)c.pause()},500);
+const cv=document.getElementById('coverVid');
+function coverPlay(){try{const r=cv.play();r&&r.catch&&r.catch(()=>{})}catch(_){}}
+$('#trailerBtn').onclick=()=>{goId('cover');cv.currentTime=0;cv.muted=false;setTimeout(coverPlay,350)};
+
+try{$$('[data-qr]').forEach(d=>new QRCode(d,{text:d.dataset.qr,width:160,height:160,colorDark:'#03060F',colorLight:'#ffffff'}))}catch(_){}
+size();
+const startId=(location.hash||'').slice(1);
+if(startId&&pages.some(p=>p.dataset.id===startId)){goId(startId)}else{idx=0;render()}
+</script>
+</body>
+</html>
