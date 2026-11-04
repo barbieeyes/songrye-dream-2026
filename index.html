@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>담장 없는 탐구</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -358,6 +358,15 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 .pp-grid img{width:100%;display:block}
 .pp-grid figcaption{font-size:10.5px;color:#4a5576;margin-top:1px;font-weight:600}
 .pp-note{text-align:center;font-size:12px;color:#4a5576;margin-top:10px;border-top:1px dashed #c9cede;padding-top:8px;word-break:keep-all}
+
+.ctrl{padding-bottom:env(safe-area-inset-bottom);height:calc(58px + env(safe-area-inset-bottom))}
+@media (max-width:860px){
+.passport{bottom:auto;top:14px;right:8px;padding:4px 4px;gap:3px;background:transparent;border:0;box-shadow:none}
+.passport i{width:19px;height:19px;font-size:10px}
+.ctrl{gap:28px}
+.ctrl .arrow{width:48px;height:48px}
+}
+@media (max-width:360px){.passport{display:none}}
 </style>
 </head>
 <body>
