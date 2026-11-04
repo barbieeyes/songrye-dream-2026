@@ -351,13 +351,16 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 .lbx img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 
 .flow small{display:block;font-size:10.5px;color:var(--mute);margin-top:2px}
-.ppsheet{margin-top:10px;background:#fbfaf6;border-radius:16px;padding:14px 14px 12px;box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 0 0 1px rgba(0,0,0,.06);color:#1b2340}
-.pp-logo{display:block;width:62%;margin:0 auto 8px}
-.pp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px 6px}
+.ppsheet{margin-top:12px}
+.pp-head{text-align:center;margin-bottom:14px}
+.pp-head b{display:block;font-family:var(--f-display);font-weight:400;font-size:26px;color:#fff;letter-spacing:.02em}
+.pp-head span{font-size:12.5px;color:var(--mute);letter-spacing:.08em}
+.pp-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 8px}
 .pp-grid figure{margin:0;text-align:center}
-.pp-grid img{width:100%;display:block}
-.pp-grid figcaption{font-size:10.5px;color:#4a5576;margin-top:1px;font-weight:600}
-.pp-note{text-align:center;font-size:12px;color:#4a5576;margin-top:10px;border-top:1px dashed #c9cede;padding-top:8px;word-break:keep-all}
+.pp-grid img{width:100%;display:block;filter:drop-shadow(0 6px 12px rgba(0,0,0,.45))}
+.pp-grid figcaption{font-size:12px;color:#fff;margin-top:6px;font-weight:600;word-break:keep-all;line-height:1.3}
+.pp-grid figcaption b{display:block;font-family:var(--f-mono);font-size:10px;color:var(--accent);letter-spacing:.08em;font-weight:500}
+.pp-note{text-align:center;font-size:12.5px;color:#fff;margin-top:16px;border-top:1px dashed var(--line);padding-top:10px;word-break:keep-all}
 
 .ctrl{padding-bottom:env(safe-area-inset-bottom);height:calc(58px + env(safe-area-inset-bottom))}
 @media (max-width:860px){
@@ -592,9 +595,9 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page L" data-id="mile2" data-chap="R" data-rub="opt1" data-col="sky" style="--accent:#4FB8FF">
   <div class="run"><b>LEVEL 1 → 10</b><span>성장여권에 붙이는 배지</span></div>
   <div class="ppsheet">
-    <img class="pp-logo" src="assets/lv_logo.jpg" alt="Songrye Science 송례중학교 과학탐구 성장 레벨">
-    <div class="pp-grid"><figure><img src="assets/lv1.jpg" alt="Lv.1 과학 스타터 배지"><figcaption>탐구 1회</figcaption></figure><figure><img src="assets/lv2.jpg" alt="Lv.2 과학 새싹 배지"><figcaption>탐구 2회</figcaption></figure><figure><img src="assets/lv3.jpg" alt="Lv.3 과학 탐험가 배지"><figcaption>탐구 3회</figcaption></figure><figure><img src="assets/lv4.jpg" alt="Lv.4 과학 도전자 배지"><figcaption>탐구 4회</figcaption></figure><figure><img src="assets/lv5.jpg" alt="Lv.5 과학 실력자 배지"><figcaption>탐구 5회</figcaption></figure><figure><img src="assets/lv6.jpg" alt="Lv.6 과학 에이스 배지"><figcaption>탐구 6회</figcaption></figure><figure><img src="assets/lv7.jpg" alt="Lv.7 과학 마스터 배지"><figcaption>탐구 7회</figcaption></figure><figure><img src="assets/lv8.jpg" alt="Lv.8 과학 챔피언 배지"><figcaption>탐구 8회</figcaption></figure><figure><img src="assets/lv9.jpg" alt="Lv.9 과학 히어로 배지"><figcaption>탐구 9회</figcaption></figure><figure><img src="assets/lv10.jpg" alt="Lv.10 과학 레전드 배지"><figcaption>탐구 10회</figcaption></figure></div>
-    <p class="pp-note">탐구 1회를 마칠 때마다 다음 레벨 배지를 한 장씩 붙입니다</p>
+    <div class="pp-head"><b>Songrye Science</b><span>송례중학교 과학탐구 성장 레벨</span></div>
+    <div class="pp-grid"><figure><img src="assets/lv1.png" alt="Lv.1 과학 스타터 배지"><figcaption><b>Lv.1</b>과학 스타터</figcaption></figure><figure><img src="assets/lv2.png" alt="Lv.2 과학 새싹 배지"><figcaption><b>Lv.2</b>과학 새싹</figcaption></figure><figure><img src="assets/lv3.png" alt="Lv.3 과학 탐험가 배지"><figcaption><b>Lv.3</b>과학 탐험가</figcaption></figure><figure><img src="assets/lv4.png" alt="Lv.4 과학 도전자 배지"><figcaption><b>Lv.4</b>과학 도전자</figcaption></figure><figure><img src="assets/lv5.png" alt="Lv.5 과학 실력자 배지"><figcaption><b>Lv.5</b>과학 실력자</figcaption></figure><figure><img src="assets/lv6.png" alt="Lv.6 과학 에이스 배지"><figcaption><b>Lv.6</b>과학 에이스</figcaption></figure><figure><img src="assets/lv7.png" alt="Lv.7 과학 마스터 배지"><figcaption><b>Lv.7</b>과학 마스터</figcaption></figure><figure><img src="assets/lv8.png" alt="Lv.8 과학 챔피언 배지"><figcaption><b>Lv.8</b>과학 챔피언</figcaption></figure><figure><img src="assets/lv9.png" alt="Lv.9 과학 히어로 배지"><figcaption><b>Lv.9</b>과학 히어로</figcaption></figure><figure><img src="assets/lv10.png" alt="Lv.10 과학 레전드 배지"><figcaption><b>Lv.10</b>과학 레전드</figcaption></figure></div>
+    <p class="pp-note">탐구 1회를 마칠 때마다 다음 레벨 배지를 한 장씩 성장여권에 붙입니다</p>
   </div>
 </article>
 
