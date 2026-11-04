@@ -337,6 +337,18 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 .qa-admin button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
 .qa.hid{opacity:.45}
 .admin-link{background:none;border:0;color:var(--mute);font-size:11.5px;text-decoration:underline;cursor:pointer;padding:0;margin-top:6px}
+
+.phs{display:grid;grid-template-columns:repeat(var(--n),1fr);gap:7px;margin:10px 0}
+.phs figure{margin:0;position:relative}
+.phs img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:10px;border:1px solid var(--line);display:block;cursor:zoom-in;background:#0b1224}
+.phs figure.tall img{object-position:top}
+.phs figure.bdg img{object-fit:contain;background:rgba(255,255,255,.04)}
+.phs[style*="--n:1"] img{aspect-ratio:21/9}
+.phs figcaption{font-size:11px;color:var(--mute);margin-top:3px;line-height:1.35;word-break:keep-all}
+.phs.mag img{aspect-ratio:4/3;object-fit:cover;object-position:top}
+.lbx{position:fixed;inset:0;z-index:200;background:rgba(2,4,11,.92);display:none;place-items:center;padding:24px;cursor:zoom-out}
+.lbx.on{display:grid}
+.lbx img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
 </style>
 </head>
 <body>
@@ -414,6 +426,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page R" data-id="q2" data-chap="D" data-rub="must" data-col="teal" style="--accent:#36C9B4">
   <div class="run"><b>D · AI 탐구 코치</b><span>3학년 · 디지털 탐구</span></div>
   <h2 class="h2">AI가 답 대신<br>질문을 돌려준 교실</h2>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/v_25.jpg" alt="예고편 장면" data-zoom></figure><figure class=""><img src="assets/v_22_5.jpg" alt="예고편 장면" data-zoom></figure></div>
   <p class="lead" style="font-size:14px">3학년은 '운동과 에너지' 단원에서 AI 탐구 코치 '큐리'와 함께 롤러코스터의 에너지를 탐구했습니다. 큐리는 정답을 주지 않고 "어떤 에너지야?", "단위는?" 하고 되물었습니다.</p>
   <div class="flow"><div><b>01</b>내 생각 먼저 쓰기</div><div><b>02</b>AI 질문 확인</div><div><b>03</b>다시 생각하기</div><div><b>04</b>수정하기</div></div>
   <p class="kicker" style="margin-top:12px">한 학생의 탐구가 고쳐진 과정</p>
@@ -440,7 +453,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
     <div class="card"><p class="meta">온라인 탐구보고서</p><h3>보고서를 디지털로 내고, 바로 확인하다</h3><p>2학년 탐구보고서를 온라인으로 제출하고, 교사는 반별 진행을 한눈에 보며 바로 피드백했습니다.</p></div>
     <div class="card"><p class="meta">AI·디지털 체험 · 컨퍼런스 4일차</p><h3>AI와 코딩을 직접 다뤄 보다</h3><p>AI 프롬프트 연구소, 코딩 플레이존, AI 포토 스튜디오 부스에서 학생이 직접 체험을 안내했습니다.</p></div>
   </div>
-  <div class="ph" style="margin-top:12px">지능형 과학실 수업 사진 자리</div>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/p_smartlab.jpg" alt="지능형 과학실 · 6월 오픈" data-zoom><figcaption>지능형 과학실 · 6월 오픈</figcaption></figure><figure class=""><img src="assets/v_20_5.jpg" alt="예고편 장면" data-zoom></figure></div>
 </article>
 
 <article class="page L opener" data-id="R" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
@@ -455,6 +468,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page R" data-id="qg" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
   <div class="run"><span>1 · 2 · 3학년</span><b>THREE GRADES</b></div>
   <h2 class="h2">세 학년,<br>세 갈래의 탐구</h2>
+  <div class="phs" style="--n:1"><figure class=""><img src="assets/v_33.jpg" alt="예고편 장면" data-zoom></figure></div>
   <p class="lead" style="font-size:14px">학년마다 탐구의 모양은 달랐지만, 질문을 세우고 끝까지 답한다는 방향은 같았습니다.</p>
   <div class="stack" style="margin-top:12px">
     <div class="card" style="border-left:4px solid #9DBCCB"><p class="meta">1학년 · 탐구의 첫걸음</p><h3>기록하고, 관찰하고, 처음 참여하다</h3><p>성장여권으로 자기 탐구 이력을 쌓기 시작했고, 시드핸즈 프로젝트에서 교내 정원의 자생식물을 관찰했습니다. 가을 컨퍼런스에 가장 많이 신청한 학년도 1학년이었습니다.</p></div>
@@ -466,11 +480,12 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page L" data-id="qg1" data-chap="R" data-rub="must" data-col="sky" style="--accent:#4FB8FF">
   <div class="run"><b>GRADE 1</b><span>1학년 · 탐구의 첫 페이지</span></div>
   <h2 class="h2">1학년,<br>탐구의 첫 페이지를 열다</h2>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/v_56.jpg" alt="예고편 장면" data-zoom></figure><figure class=""><img src="assets/v_57_5.jpg" alt="예고편 장면" data-zoom></figure></div>
   <div class="stack">
     <div class="card"><p class="meta">과학탐구 성장여권 · 7~12월</p><h3>첫 탐구부터 기록으로 남기다</h3><p>입학 첫해부터 행사·대회·수업 보고서를 인증 스티커로 모으며, 자기 탐구의 길을 스스로 기록했습니다.</p></div>
     <div class="card"><p class="meta">시드핸즈 프로젝트 · 10~11월 · 1·2학년</p><h3>학교 정원에서 식물을 다시 보다</h3><p>식물의 구조와 표본을 관찰하고, 학교와 인근의 자생식물 해설을 들으며 씨앗을 거둘 준비를 했습니다.</p></div>
     <div class="card"><p class="meta">사이언스·에코 컨퍼런스 · 10월</p><h3>가장 먼저 손을 든 학년</h3><p>나흘간의 컨퍼런스에 세 학년 중 가장 많이 신청해, 공연과 사진전, 포럼과 심포지엄을 함께했습니다.</p></div>
-    <div class="ph">1학년 정규 수업 탐구(단원·주제·보고서) 자료가 들어갈 자리</div>
+    
   </div>
 </article>
 
@@ -509,6 +524,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page L" data-id="d1" data-chap="R" data-rub="opt1" data-col="sky" style="--accent:#4FB8FF">
   <div class="run"><span>동아리 연구 → 시민 앞으로</span><b>R · 동아리 연구</b></div>
   <h2 class="h2">교실 밖에서<br>시민에게 설명하다</h2>
+  <div class="phs" style="--n:1"><figure class=""><img src="assets/v_64_5.jpg" alt="예고편 장면" data-zoom></figure></div>
   <p class="lead" style="font-size:14px">봄, 국립중앙과학관 제55회 사이언스데이. 두 동아리가 자기 연구를 체험 부스로 만들어 시민 앞에 섰습니다.</p>
   <div class="card" style="margin-top:12px">
     <p class="meta">어스 아키텍트 · 기후환경</p>
@@ -540,6 +556,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
     <div class="card"><p class="meta">과학캠프 · 6월 · 강릉원주대 해양과학교육원</p><h3>살아 있는 바다를 현미경으로</h3><p>플랑크톤을 현미경으로 들여다보고, 어류와 무척추동물을 관찰하고, 밤에는 별을 보고, 경포대 바닷가에서 해양을 탐구했습니다.</p></div>
     <div class="card"><p class="meta">과학탐구 성장여권 · 7~12월 · 전교생</p><h3>탐구 이력을 스스로 쌓는 여권</h3><p>행사, 대회, 수업 보고서마다 인증 스티커를 모으고 레벨을 올리며 자기 탐구의 길을 기록합니다.</p></div>
       </div>
+  <div class="phs" style="--n:3"><figure class=""><img src="assets/v_28_5.jpg" alt="예고편 장면" data-zoom></figure><figure class=""><img src="assets/v_30.jpg" alt="예고편 장면" data-zoom></figure><figure class="bdg"><img src="assets/p_badges.png" alt="성장 마일리지 배지 Lv.1~10" data-zoom><figcaption>성장 마일리지 배지 Lv.1~10</figcaption></figure></div>
   <div class="changed"><span class="kicker">그래서 달라진 것</span><p>과학이 수업 시간에만 있는 과목이 아니라, 학교의 일상이 되었습니다.</p></div>
 </article>
 
@@ -585,9 +602,9 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
     <div><figure class="shot" style="--tilt:-1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/dash.jpg" alt="탐구보고서 대시보드"></div><figcaption><span class="evi">실제 운영 화면</span>탐구보고서 대시보드</figcaption></figure></div>
     <div><figure class="shot" style="--tilt:1deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/survey1.jpg" alt="사후 설문 분석 도구"></div><figcaption><span class="evi">실제 운영 화면</span>사후 설문 분석 도구</figcaption></figure></div>
     <div><figure class="shot" style="--tilt:.8deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/confreg.jpg" alt="컨퍼런스 신청 시스템"></div><figcaption><span class="evi">실제 운영 화면</span>컨퍼런스 신청 시스템</figcaption></figure></div>
-    <div class="ph" style="margin-top:10px;min-height:120px">AI 탐구 코치 큐리<br>화면 캡처 자리</div>
+    <div><figure class="shot" style="--tilt:-.6deg"><div class="frame"><div class="chrome"><i></i><i></i><i></i></div><img src="assets/v_40_5.jpg" alt="AI 질문형 피드백 수업" data-zoom></div><figcaption><span class="evi">수업 장면</span>AI 질문형 피드백을 교실에서 검증</figcaption></figure></div>
   </div>
-  <div class="ph" style="margin-top:10px">교사연구회 활동 기록과 타 학교 공유 실적이 들어갈 자리</div>
+  <div class="phs" style="--n:1;margin-top:10px"><figure class=""><img src="assets/v_42.jpg" alt="예고편 장면" data-zoom></figure></div>
 </article>
 
 <article class="page R" data-id="E2" data-chap="E" data-rub="opt2" data-col="peri" style="--accent:#9AA8FF">
@@ -625,6 +642,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page L" data-id="s2" data-chap="A" data-rub="opt3" data-col="lime" style="--accent:#7CE38B">
   <div class="run"><b>A · 초등</b><span>7월 · 송례과학챌린지</span></div>
   <h2 class="h2">선배와 함께 배운<br>초등학생의 하루</h2>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/p_robot.jpg" alt="장애물 회피 자동차 만들기" data-zoom><figcaption>장애물 회피 자동차 만들기</figcaption></figure><figure class=""><img src="assets/v_48_5.jpg" alt="예고편 장면" data-zoom></figure></div>
   <p class="lead" style="font-size:14px">이웃 송례초와 위례별초 6학년을 학교로 초대해 중학생과 한 모둠으로 STEAM 융합과학교실을 열었습니다.</p>
   <div style="display:grid;grid-template-columns:.9fr 1.1fr;gap:12px;margin-top:12px;align-items:start">
     <img src="assets/challenge_poster.jpg" alt="송례과학챌린지 STEAM 융합과학교실 홍보 포스터" style="border-radius:10px;border:1px solid var(--line)">
@@ -639,6 +657,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page R" data-id="s3" data-chap="A" data-rub="opt3" data-col="lime" style="--accent:#7CE38B">
   <div class="run"><span>4월 → 11월</span><b>A · 씨앗</b></div>
   <h2 class="h2">씨앗 한 알의 여행</h2>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/v_53.jpg" alt="예고편 장면" data-zoom></figure><figure class=""><img src="assets/p_scope.jpg" alt="씨앗을 현미경으로 관찰하기" data-zoom><figcaption>씨앗을 현미경으로 관찰하기</figcaption></figure></div>
   <p class="lead" style="font-size:14px">학교에서 나눈 씨앗이 마을의 아이들에게 건너가고, 마지막에는 나라의 씨앗 금고에 닿았습니다.</p>
   <div class="journey">
     <div><i>학교</i><p><b>송례 씨앗은행</b><span>허브 모종을 빌려 키우고, 거둔 씨앗을 다시 반납하는 순환</span></p></div>
@@ -652,6 +671,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page L" data-id="c1" data-chap="A" data-rub="out" data-col="lime" style="--accent:#7CE38B">
   <div class="run"><span>7월 · 졸업생 이공계 멘토</span><b>A · 진로</b></div>
   <h2 class="h2">「감사로 이어진<br>송례공동체」</h2>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/p_mentor.jpg" alt="7.8 공감교실 · 진학 멘토링" data-zoom><figcaption>7.8 공감교실 · 진학 멘토링</figcaption></figure><figure class="tall"><img src="assets/p_mposter.jpg" alt="안내 포스터" data-zoom><figcaption>안내 포스터</figcaption></figure></div>
   <p class="lead" style="font-size:14px">송례중을 졸업하고 과학고를 거쳐 KAIST에 진학한 선배가 후배들 앞에 섰습니다. 선배는 이 학교에서 했던 실험과 동아리 경험이 어떻게 진학의 바탕이 되었는지, 지금의 선도학교 프로그램을 어떻게 쓰면 좋은지 들려주었습니다. 이 자리에는 강동송파영재교육원 학생들도 함께했습니다.</p>
   <svg id="ladder" viewBox="0 0 420 330" role="img" aria-label="송례중에서 과학고, KAIST로 이어지고 다시 후배에게 돌아오는 길">
     <defs><linearGradient id="lg" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#4FD8FF"/><stop offset="1" stop-color="#FFB547"/></linearGradient><marker id="ar" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M0 0L8 4L0 8z" fill="#FFB547"/></marker></defs>
@@ -669,6 +689,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page R" data-id="c2" data-chap="A" data-rub="out" data-col="lime" style="--accent:#7CE38B">
   <div class="run"><b>A · 진로</b><span>진로가 보이는 자리</span></div>
   <h2 class="h2">연구자의 자리에<br>미리 서 보다</h2>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/v_59.jpg" alt="예고편 장면" data-zoom></figure><figure class=""><img src="assets/v_60_5.jpg" alt="예고편 장면" data-zoom></figure></div>
   <div class="stack">
     <div class="card"><p class="meta">8월 · 서울대학교</p><h3>캠퍼스를 걷고, 대학생에게 묻다</h3><p>조별로 캠퍼스를 돌아보고 이공계 대학생 멘토에게 공부와 진로를 직접 물었습니다.</p></div>
     <div class="card"><p class="meta">10월 · 과학드림 토크콘서트</p><h3>과학을 전하는 직업을 만나다</h3><p>과학 크리에이터에게 과학을 즐기고 알리는 진로를 들었습니다.</p></div>
@@ -689,6 +710,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page R" data-id="s4" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
   <div class="run"><b>M · 컨퍼런스</b><span>10.14 – 10.17</span></div>
   <h2 class="h2">마을에 문을 연 나흘,<br>사이언스·에코 컨퍼런스</h2>
+  <div class="phs" style="--n:2"><figure class=""><img src="assets/p_banner.jpg" alt="교문 위 4일 일정 현수막" data-zoom><figcaption>교문 위 4일 일정 현수막</figcaption></figure><figure class=""><img src="assets/v_66_5.jpg" alt="예고편 장면" data-zoom></figure></div>
   
   <div style="display:grid;grid-template-columns:.8fr 1.2fr;gap:12px;align-items:start"><div class="illus" style="--tilt:-1.5deg;margin-top:0"><img src="assets/conf_poster.jpg" alt="2026 송례 STEP-IN 주니어 사이언스·에코 컨퍼런스 포스터"></div><div class="days4" style="grid-template-columns:1fr;margin-top:0">
     <div style="--dc:var(--d1)"><span>DAY 1 · INSIGHT</span><b>만나다</b><p>오케스트라 공연과 과학드림의 진로 토크콘서트</p></div>
@@ -701,6 +723,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 <article class="page L" data-id="s4b" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
   <div class="run"><span>10.17 · 운동장</span><b>SYMPOSIUM</b></div>
   <h2 class="h2">운동장에 펼친<br>주니어 심포지엄</h2>
+  <div class="phs" style="--n:3"><figure class=""><img src="assets/v_69_5.jpg" alt="예고편 장면" data-zoom></figure><figure class=""><img src="assets/v_70_5.jpg" alt="예고편 장면" data-zoom></figure><figure class=""><img src="assets/v_72_5.jpg" alt="예고편 장면" data-zoom></figure></div>
   <p class="lead" style="font-size:14px">학생과 영재교육원의 연구 포스터가 운동장을 둘러싸고, 가운데는 학부모와 이웃 초등학생이 오가는 관람 길로 비워 두었습니다. 체험부스에서는 중학생이 직접 실험을 안내했습니다.</p>
   <div class="illus" style="--tilt:.8deg"><img src="assets/layout.jpg" alt="K-STEM 심포지엄 운동장 배치도 일러스트"></div>
   <p class="note" style="margin-top:8px">심포지엄 배치도 · 영재교육원 포스터 발표존, 학생 포스터 테이블, 체험부스, 사진전</p>
@@ -729,7 +752,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
     <div class="card"><p class="meta">이달의 과학 행사 · 이달의 과학자</p><p>캠프 성과와 다음 행사 안내, 켈빈 경과 절대온도 이야기</p></div>
     <div class="card"><p class="meta">이달의 밤하늘 · 이달의 과학 명언</p><p>여름철 대삼각형 관측 시기, 호기심을 여는 한마디</p></div>
   </div>
-  <div class="ph" style="margin-top:12px">발행된 소식지 표지 이미지 자리</div>
+  <div class="phs mag" style="--n:2;margin-top:12px"><figure class=""><img src="assets/mag_b.jpg" alt="6월호 · 지능형 과학실 OPEN" data-zoom><figcaption>6월호 · 지능형 과학실 OPEN</figcaption></figure><figure class=""><img src="assets/mag_a.jpg" alt="9월호 · 졸업생 특강·서울대 투어" data-zoom><figcaption>9월호 · 졸업생 특강·서울대 투어</figcaption></figure></div>
 </article>
 
 <article class="page R" data-id="s5" data-chap="M" data-rub="opt3" data-col="amber" style="--accent:#FFB547">
@@ -778,6 +801,7 @@ ul.clean li::before{content:"";position:absolute;left:0;top:.68em;width:5px;heig
 </article>
 </div>
 
+<div class="lbx" id="lbx" role="dialog" aria-label="사진 크게 보기"><img alt=""></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -901,6 +925,11 @@ $('#rmap').innerHTML=sh}
 
 
 
+
+/* photo zoom */
+document.addEventListener('click',e=>{const im=e.target.closest('img[data-zoom]');if(!im)return;e.stopPropagation();const l=$('#lbx');l.querySelector('img').src=im.src;l.querySelector('img').alt=im.alt;l.classList.add('on')},true);
+$('#lbx').addEventListener('click',e=>{e.stopPropagation();$('#lbx').classList.remove('on')});
+addEventListener('keydown',e=>{if(e.key==='Escape')$('#lbx').classList.remove('on')});
 /* Q&A board */
 const SB_URL='https://uxzhlvulknngihjrddul.supabase.co',SB_KEY='sb_publishable_OiYlf2nZg0iyGeDhSevJeQ_ZWB7k4wH';
 async function rpc(fn,body){const r=await fetch(SB_URL+'/rest/v1/rpc/'+fn,{method:'POST',headers:{'apikey':SB_KEY,'Content-Type':'application/json'},body:JSON.stringify(body||{})});const t=await r.text();let j=null;try{j=t?JSON.parse(t):null}catch(_){}if(!r.ok)throw new Error((j&&j.message)||'요청 실패');return j}
