@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400">
+  <defs>
+    <path id="ring" d="M200,200 m-148,0 a148,148 0 1,1 296,0 a148,148 0 1,1 -296,0"/>
+  </defs>
+  <circle cx="200" cy="200" r="196" fill="#c6f432"/>
+  <circle cx="200" cy="200" r="184" fill="#0f2a1b"/>
+  <circle cx="200" cy="200" r="118" fill="none" stroke="#c6f432" stroke-width="3" stroke-dasharray="2 9" stroke-linecap="round"/>
+  <text font-family="Arial Black, Helvetica, sans-serif" font-weight="900" font-size="26" letter-spacing="4" fill="#f4f1e6">
+    <textPath href="#ring" startOffset="0">SONGGREEN · SONGRYE MIDDLE SCHOOL ·</textPath>
+  </text>
+  <!-- ground -->
+  <path d="M128 268 Q200 246 272 268" fill="none" stroke="#c6f432" stroke-width="10" stroke-linecap="round"/>
+  <!-- stem -->
+  <path d="M200 262 C200 228 198 200 202 168" fill="none" stroke="#c6f432" stroke-width="10" stroke-linecap="round"/>
+  <!-- left leaf -->
+  <path d="M199 206 C170 214 136 200 126 160 C166 150 194 170 199 206 Z" fill="#c6f432"/>
+  <path d="M196 202 C176 190 156 178 136 164" fill="none" stroke="#0f2a1b" stroke-width="4" stroke-linecap="round"/>
+  <!-- right leaf -->
+  <path d="M203 172 C214 132 248 108 290 116 C284 160 248 182 203 172 Z" fill="#7fd6a0"/>
+  <path d="M208 168 C232 152 254 136 278 124" fill="none" stroke="#0f2a1b" stroke-width="4" stroke-linecap="round"/>
+  <!-- water drop -->
+  <path d="M150 112 C150 112 138 128 138 136 a12 12 0 0 0 24 0 C162 128 150 112 150 112 Z" fill="#f4f1e6"/>
+</svg>
