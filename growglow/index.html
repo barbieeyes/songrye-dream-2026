@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grow & Glow 캠프 영상</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Gowun+Dodum&family=Poppins:wght@600;700&display=swap">
+<style>
+  :root{--ink:#0a102e;--navy:#141c4a;--gold:#e8c468;--soft:#bec8ff;--leaf:#9ed27a}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:radial-gradient(120% 80% at 50% 0%,#1d2766 0%,var(--ink) 60%);color:#fff;font-family:"Gowun Dodum",system-ui,sans-serif}
+  body{background-attachment:fixed}
+  .sky{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+  .sky i{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff8dc;animation:tw 3s ease-in-out infinite}
+  @keyframes tw{50%{opacity:.15}}
+  main{position:relative;max-width:980px;margin:0 auto;padding:28px 18px 48px}
+  .top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .badge{font-family:Poppins,sans-serif;font-weight:700;font-size:13px;letter-spacing:.06em;background:var(--gold);color:var(--ink);padding:4px 10px;border-radius:7px}
+  .badge.grow{background:var(--leaf)}
+  .date{margin-left:auto;color:var(--soft);font-family:Poppins,sans-serif;font-size:13px}
+  h1{font-family:"Do Hyeon",sans-serif;font-weight:400;font-size:clamp(34px,7vw,58px);line-height:1.1;margin:18px 0 6px;text-shadow:0 0 24px rgba(232,196,104,.45)}
+  h1 span{color:var(--gold)}
+  .sub{color:var(--soft);font-size:16px;margin:0 0 22px}
+  .player{position:relative;border-radius:22px;padding:4px;background:linear-gradient(135deg,var(--gold),#7f8cff 50%,var(--leaf));box-shadow:0 12px 50px rgba(0,0,0,.5),0 0 40px rgba(232,196,104,.25)}
+  video{display:block;width:100%;aspect-ratio:16/9;border-radius:18px;background:#000}
+  .chapters{display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 0}
+  .chapters button{font:inherit;font-size:15px;color:#fff;background:rgba(255,255,255,.07);border:1px solid rgba(232,196,104,.45);border-radius:999px;padding:8px 14px;cursor:pointer}
+  .chapters button:hover{background:rgba(232,196,104,.18)}
+  .note{margin-top:26px;color:var(--soft);font-size:14px;line-height:1.6}
+  .err{display:none;margin-top:12px;color:#ffd38a}
+</style>
+</head>
+<body>
+<div class="sky" id="sky"></div>
+<main>
+  <div class="top"><span class="badge">GLOW</span><span class="badge grow">GROW</span><span class="date">2026.11.13 — 14 · 별새꽃돌과학관</span></div>
+  <h1>Grow &amp; Glow <span>생태전환캠프</span> ✨</h1>
+  <p class="sub">별빛 가득한 첫날 밤부터 자라나는 둘째 날까지, 우리의 1박 2일</p>
+  <div class="player">
+    <video id="v" controls playsinline preload="metadata" poster="poster.jpg"></video>
+  </div>
+  <p class="err" id="err">영상을 불러오지 못했어요. 페이지를 새로고침해 주세요.</p>
+  <div class="chapters" id="ch">
+    <button data-t="0">🔭 오프닝</button>
+    <button data-t="12.8">🌌 첫째 날 밤</button>
+    <button data-t="39.4">🎹 피아노 콘서트</button>
+    <button data-t="50.4">🔥 캠프파이어</button>
+    <button data-t="77.6">🌱 둘째 날 아침</button>
+    <button data-t="91.6">🐦 새·꽃 탐구</button>
+    <button data-t="131.4">🪨 암석·광물 탐구</button>
+    <button data-t="215">✨ 야광 암석</button>
+    <button data-t="248.6">🦴 화석 탐정</button>
+    <button data-t="270.7">💛 엔딩</button>
+  </div>
+  <p class="note">학생이 만든 영상에 선생님이 찍은 영상을 더해 다시 편집했어요. 배경음은 이 영상을 위해 만든 곡이에요.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js"></script>
+<script>
+(function(){
+  var sky=document.getElementById('sky');
+  for(var i=0;i<70;i++){var s=document.createElement('i');s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';s.style.animationDelay=(Math.random()*3)+'s';if(Math.random()<.2){s.style.width=s.style.height='3px'}sky.appendChild(s)}
+  var v=document.getElementById('v'),src='v/play.m3u8';
+  function fail(){document.getElementById('err').style.display='block'}
+  if(window.Hls&&Hls.isSupported()){
+    var h=new Hls({maxBufferLength:30});h.loadSource(src);h.attachMedia(v);
+    h.on(Hls.Events.ERROR,function(e,d){if(d.fatal){if(d.type===Hls.ErrorTypes.NETWORK_ERROR)h.startLoad();else if(d.type===Hls.ErrorTypes.MEDIA_ERROR)h.recoverMediaError();else fail()}});
+  }else if(v.canPlayType('application/vnd.apple.mpegurl')){v.src=src;v.addEventListener('error',fail)}
+  else fail();
+  document.getElementById('ch').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;v.currentTime=parseFloat(b.dataset.t);var p=v.play();if(p&&p.catch)p.catch(function(){});});
+})();
+</script>
+</body>
+</html>
