@@ -1,0 +1,21 @@
+(function(){
+var S=[].slice.call(document.querySelectorAll('#stage>section')),i=0,st=document.getElementById('stage');
+function fit(){var k=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform='scale('+k+') translate(-50%,-50%)';st.style.transformOrigin='0 0';st.style.left='50%';st.style.top='50%';st.style.transform='translate(-50%,-50%) scale('+k+')';st.style.transformOrigin='center center';}
+var v=document.getElementById('jv'),pb=document.getElementById('pb');
+function show(n){if(n<0||n>=S.length)return;if(v&&!v.paused)v.pause();S[i].classList.remove('on');i=n;S[i].classList.add('on');document.getElementById('pg').textContent=(i+1)+' / '+S.length;try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
+function toggle(){if(!v)return;if(v.paused){v.play();pb.classList.add('hide')}else{v.pause();pb.classList.remove('hide')}}
+if(v){pb.onclick=function(e){e.stopPropagation();toggle()};v.onclick=function(e){e.stopPropagation();toggle()};v.onended=function(){pb.classList.remove('hide')}}
+document.getElementById('prev').onclick=function(e){e.stopPropagation();show(i-1)};
+document.getElementById('next').onclick=function(e){e.stopPropagation();show(i+1)};
+document.getElementById('fs').onclick=function(e){e.stopPropagation();if(document.fullscreenElement)document.exitFullscreen();else document.documentElement.requestFullscreen&&document.documentElement.requestFullscreen()};
+var cp=document.getElementById('cp');if(cp)cp.onclick=function(e){e.stopPropagation();try{navigator.clipboard.writeText('SOR-2026-RP67');cp.textContent='복사됨!'}catch(x){}};
+st.addEventListener('click',function(e){if(e.target.closest('a,button,video'))return;show(i+1)});
+addEventListener('keydown',function(e){var k=e.key;
+ if(k==='ArrowRight'||k==='PageDown'||k===' '&&!(S[i].id==='journey')){e.preventDefault();show(i+1)}
+ else if(k==='ArrowLeft'||k==='PageUp'){e.preventDefault();show(i-1)}
+ else if(k===' '&&S[i].id==='journey'){e.preventDefault();toggle()}
+ else if(k==='f'||k==='F'){document.getElementById('fs').click()}
+ else if(k==='Home')show(0);else if(k==='End')show(S.length-1)});
+addEventListener('resize',fit);fit();
+function fromHash(){var h=parseInt(location.hash.slice(1));if(h>0&&h<=S.length&&h-1!==i)show(h-1)}var h0=parseInt(location.hash.slice(1));S[0].classList.add("on");show(h0>0&&h0<=S.length?h0-1:0);addEventListener("hashchange",fromHash);
+})();
