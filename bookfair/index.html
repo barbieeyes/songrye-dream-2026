@@ -15,7 +15,7 @@
 
 </section>
 <section id="journey" class="dark" data-transition="fade">
-<video class="video-full" id="jv" src="assets/journey.mp4" poster="assets/poster.jpg" playsinline preload="metadata"></video><button class="playbtn" id="pb" aria-label="영상 재생">▶ 여정 영상 재생</button>
+<video class="video-full" id="jv" src="assets/journey.mp4" poster="assets/poster.jpg" playsinline preload="metadata"></video><button class="playbtn" id="pb" aria-label="영상 재생">▶ 여정 영상 재생</button><div class="vbar" id="vbar"><button id="vp" aria-label="재생/일시정지">▶</button><span id="vt">0:00</span><input id="vs" type="range" min="0" max="1000" value="0" aria-label="재생 위치"><span id="vd">0:00</span><button id="vr" aria-label="처음부터">↺</button></div>
 
 </section>
 <section id="agenda" class="cream" data-transition="fade">
@@ -132,5 +132,5 @@
 
 </section>
 </div>
-<nav id="nav"><button id="prev" aria-label="이전">‹</button><span id="pg"></span><button id="next" aria-label="다음">›</button><button id="fs" aria-label="전체 화면">⛶</button></nav>
+<button class="side" id="prev" aria-label="이전 슬라이드">‹</button><button class="side" id="next" aria-label="다음 슬라이드">›</button><nav id="nav"><span id="pg"></span><button id="fs" aria-label="전체 화면">⛶ 전체 화면</button></nav>
 <script src="player.js"></script></body></html>
