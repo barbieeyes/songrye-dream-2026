@@ -5,7 +5,7 @@ var W=Math.min(innerWidth,d.clientWidth||innerWidth,vv?vv.width*(vv.scale||1):in
 var k=Math.min(W/1920,H/1080)*0.995;st.style.left=(W-1920*k)/2+'px';st.style.top=(H-1080*k)/2+'px';st.style.transformOrigin='0 0';st.style.transform='scale('+k+')';}
 var v=document.getElementById('jv'),pb=document.getElementById('pb');
 function show(n){if(n<0||n>=S.length)return;document.getElementById('prev').disabled=n===0;document.getElementById('next').disabled=n===S.length-1;if(v&&!v.paused)v.pause();S[i].classList.remove('on');i=n;S[i].classList.add('on');document.getElementById('pg').textContent=(i+1)+' / '+S.length;try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
-function toggle(){if(!v)return;if(v.paused){v.play()}else{v.pause()}}
+function toggle(){if(!v)return;if(v.paused){v.muted=false;v.volume=1;v.play()}else{v.pause()}}
 var vp=document.getElementById('vp'),vs=document.getElementById('vs'),vt=document.getElementById('vt'),vd=document.getElementById('vd'),vbar=document.getElementById('vbar'),drag=false;
 function fmt(s){s=Math.max(0,Math.floor(s||0));return Math.floor(s/60)+':'+('0'+s%60).slice(-2)}
 if(v){v.addEventListener('play',function(){vp.textContent='❚❚';pb.classList.add('hide');vbar.classList.remove('show')});
