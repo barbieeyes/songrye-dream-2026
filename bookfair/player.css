@@ -61,3 +61,13 @@ section.luw{background:#fff;color:#1B1E4B}
 @keyframes cutepop{from{opacity:0;transform:scale(.97)}}
 section.luw .cute{z-index:1}
 .vopen{position:absolute;right:40px;top:36px;font:700 24px "Noto Sans KR",sans-serif;color:#fff;background:rgba(20,16,14,.7);padding:12px 24px;border-radius:30px;text-decoration:none}
+
+.qrleft{position:absolute;left:128px;top:170px;width:900px}
+.qrt{font-size:84px!important;line-height:1.15!important;margin:18px 0 28px!important}
+.qrsteps{display:flex;gap:16px;margin-top:48px}
+.qrsteps p{font-size:30px;font-weight:700;background:#FFFDF8;border:2px solid #E6DCC8;border-radius:20px;padding:14px 22px}
+.qrsteps b{color:#C45A43;margin-right:10px}
+.qrbig{position:absolute;right:150px;top:200px;width:640px;height:640px;background:#fff;border:8px solid #22221E;border-radius:44px;display:flex;align-items:center;justify-content:center;box-shadow:0 18px 0 #FFC22E}
+.qrbig img{width:570px;height:570px;image-rendering:pixelated}
+.prep{display:inline-block;font-size:40px;font-weight:700;background:#FFC22E;color:#22221E;padding:10px 34px;border-radius:40px;margin-bottom:22px}
+.qrleft{top:140px}
