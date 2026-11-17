@@ -56,3 +56,7 @@ section.luw{background:#fff;color:#1B1E4B}
 .lulist .c{font-size:24px;font-weight:700;color:#1B1E4B;background:#EEF0F8;border-radius:10px;padding:3px 14px}
 .lufoot{position:absolute;left:0;right:0;bottom:0;height:72px;background:#1B1E4B;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 128px;font-size:26px;font-weight:700}
 .lufoot div:first-child{color:#FFC22E}
+
+.cute{position:absolute;inset:0;width:1920px;height:1080px;z-index:-1;pointer-events:none;animation:cutepop .7s .4s ease-out both}
+@keyframes cutepop{from{opacity:0;transform:scale(.97)}}
+section.luw .cute{z-index:1}
