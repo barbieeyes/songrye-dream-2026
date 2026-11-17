@@ -41,3 +41,18 @@ video.video-full{background:#000;object-fit:contain}
 .mc .big{font-size:72px!important}
 .mc h3{font-size:50px!important}
 .mc .desc{font-size:32px!important}
+
+section.luw{background:#fff;color:#1B1E4B}
+.luleft{position:absolute;left:128px;top:130px;width:640px}
+.lut{font-size:116px!important;line-height:1.08!important;font-weight:700;margin-top:16px!important;color:#1B1E4B}
+.lupill{display:inline-block;margin-top:26px;background:#FFC22E;color:#1B1E4B;font-size:32px;font-weight:700;padding:8px 26px;border-radius:30px}
+.luill{display:block;width:600px;height:364px;margin:40px 0 0 -20px}
+.lulist{position:absolute;left:840px;right:128px;top:86px;display:flex;flex-direction:column}
+.lulist .r{display:flex;align-items:center;gap:24px;padding:7px 0;border-bottom:2px solid #E6E8F2}
+.lulist .n{flex:none;width:50px;height:50px;border-radius:25px;font-size:25px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.lulist .m{flex:1}
+.lulist .a{font-size:32px;font-weight:700;display:flex;align-items:baseline;gap:14px;color:#1B1E4B}
+.lulist .lab{font-size:22px;font-weight:700;color:#7C5CFF;position:relative;top:-3px}
+.lulist .c{font-size:24px;font-weight:700;color:#1B1E4B;background:#EEF0F8;border-radius:10px;padding:3px 14px}
+.lufoot{position:absolute;left:0;right:0;bottom:0;height:72px;background:#1B1E4B;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 128px;font-size:26px;font-weight:700}
+.lufoot div:first-child{color:#FFC22E}
