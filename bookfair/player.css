@@ -33,3 +33,11 @@ video.video-full{background:#000;object-fit:contain}
 .vbar input{flex:1;height:14px;accent-color:#FFC22E;cursor:pointer}
 .vbar span{min-width:72px;text-align:center}
 .playbtn{bottom:150px}
+
+#mission .deco{position:absolute;inset:0;width:1920px;height:1080px;z-index:-1;pointer-events:none}
+.mrow{margin-top:110px;gap:44px;padding:0 60px}
+.mc{position:relative;padding-top:150px!important;align-items:center;text-align:center;border-radius:36px!important;box-shadow:0 14px 0 rgba(0,0,0,.05)}
+.mc .ico{position:absolute;top:-52px;left:50%;transform:translateX(-50%);width:180px;height:190px}
+.mc .big{font-size:72px!important}
+.mc h3{font-size:50px!important}
+.mc .desc{font-size:32px!important}
