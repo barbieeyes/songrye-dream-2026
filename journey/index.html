@@ -33,6 +33,8 @@ h1{margin:0;font-weight:900;font-size:clamp(28px,5vw,48px);letter-spacing:-.02em
 .fill{position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(90deg,var(--c1),var(--c2),var(--c3),var(--c4),var(--c5))}
 .knob{position:absolute;top:8px;width:14px;height:14px;border-radius:50%;background:#fff;margin-left:-7px;left:0}
 .time{font-variant-numeric:tabular-nums;font-size:13px;color:var(--mute);font-weight:700;flex:none;min-width:86px;text-align:right}
+.fsbtn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;border:0;border-radius:14px;background:var(--c4);color:var(--navy);font:900 17px "Noto Sans KR",sans-serif;padding:14px;cursor:pointer}
+.fsbtn svg{width:22px;height:22px}
 .chap{display:flex;flex-wrap:wrap;gap:8px}
 .chap button{border:2px solid #34367a;background:transparent;color:#d8d9f2;border-radius:999px;padding:7px 14px;font:700 14px "Noto Sans KR",sans-serif;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
 .chap button i{width:10px;height:10px;border-radius:50%;display:block}
@@ -53,7 +55,9 @@ h1{margin:0;font-weight:900;font-size:clamp(28px,5vw,48px);letter-spacing:-.02em
   <h1>우리가 만드는 디지털 과학책</h1>
   <p class="sub">기획에서 북 페어까지, 다섯 차시의 여정 · <b>2분 28초</b></p>
 
-  <div class="player"><video id="v" controls playsinline preload="metadata" poster="/journey/poster.jpg" src="/journey/journey.mp4"></video></div>
+  <div class="player"><video id="v" controls playsinline preload="metadata" poster="/journey/poster.jpg?v=2" src="/journey/journey.mp4?v=2"></video></div>
+
+  <button class="fsbtn" id="fs" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>영상만 전체 화면으로 보기</button>
 
   <div class="chap" id="chap"></div>
 
@@ -64,6 +68,11 @@ h1{margin:0;font-weight:900;font-size:clamp(28px,5vw,48px);letter-spacing:-.02em
 <script>
 const v=document.getElementById('v');
 const CH=[['오프닝',0,'#fff'],['1 기획',15,'var(--c1)'],['2 집필',29,'var(--c2)'],['3 편집과 교정',56,'var(--c3)'],['4 출간',78,'var(--c4)'],['5 북 페어',127.5,'var(--c5)'],['엔딩',138,'#fff']];
+document.getElementById('fs').onclick=()=>{
+  if(v.requestFullscreen){v.requestFullscreen().then(()=>v.play().catch(()=>{})).catch(()=>{if(v.webkitEnterFullscreen)v.webkitEnterFullscreen()})}
+  else if(v.webkitRequestFullscreen){v.webkitRequestFullscreen()}
+  else if(v.webkitEnterFullscreen){v.play().catch(()=>{});v.webkitEnterFullscreen()}
+};
 const ch=document.getElementById('chap');
 CH.forEach(c=>{const b=document.createElement('button');b.innerHTML='<i style="background:'+c[2]+'"></i>'+c[0];b.onclick=()=>{v.currentTime=c[1];v.play().catch(()=>{})};ch.appendChild(b)});
 v.addEventListener('timeupdate',()=>{let k=0;CH.forEach((c,i)=>{if(v.currentTime>=c[1]-0.05)k=i});ch.querySelectorAll('button').forEach((b,i)=>b.classList.toggle('on',i===k))});
